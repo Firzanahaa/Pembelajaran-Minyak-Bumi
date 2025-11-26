@@ -1,1 +1,384 @@
+<!doctype html>
+<html lang="id">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pembelajaran Minyak Bumi - Kimia Kelas 11</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    
+    * {
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    .gradient-bg {
+      background: linear-gradient(135deg, #1e3a8a 0%, #0e7490 50%, #14b8a6 100%);
+    }
+    
+    .card-hover {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .card-hover:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-hover {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .btn-hover:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 25px rgba(20, 184, 166, 0.4);
+    }
+    
+    .nav-link {
+      transition: color 0.3s ease, border-bottom 0.3s ease;
+      border-bottom: 2px solid transparent;
+      text-decoration: none; /* Menghilangkan garis bawah default link */
+    }
+    
+    .nav-link:hover {
+      color: #14b8a6;
+      border-bottom-color: #14b8a6;
+    }
+    
+    .hero-illustration {
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="min-h-full">
+  <div id="app" class="w-full min-h-full"></div>
+  <script>
+    const defaultConfig = {
+      site_title: "Pembelajaran Minyak Bumi - Kimia Kelas 11",
+      hero_title: "Jelajahi Dunia Minyak Bumi",
+      hero_description: "Pelajari proses pembentukan, pengolahan, dan pemanfaatan minyak bumi sebagai sumber energi utama dunia. Mari memahami kimia di balik sumber daya alam yang sangat berharga ini!",
+      cta_button: "Mulai Belajar",
+      copyright_text: "© 2025 Pembelajaran Minyak Bumi. Semua hak dilindungi.",
+      background_color: "#0f172a",
+      surface_color: "#1e293b",
+      text_color: "#f1f5f9",
+      primary_action: "#14b8a6",
+      secondary_action: "#0e7490",
+      font_family: "Poppins",
+      font_size: 16
+    };
 
+    let config = { ...defaultConfig };
+
+    // PERBAIKAN 1: Menambahkan 'page' untuk Beranda agar linknya jelas
+    const menuItems = [
+      { name: 'Beranda', icon: '🏠', active: true, page: 'index.html' },
+      { name: 'Materi', icon: '📚', active: false,  page: 'hal2.html' },
+      { name: 'Simulasi', icon: '🔬', active: false, page: 'hal3.html'},
+      { name: 'Fun Facts', icon: '💡', active: false, page: 'hal4.html' },
+      { name: 'Kuis', icon: '✏️', active: false, page: 'hal5.html' },
+      { name: 'Glosarium', icon: '📖', active: false, page: 'hal6.html' },
+      { name: 'Ringkasan', icon: '📋', active: false, page: 'hal7.html' }
+    ];
+
+    const features = [
+      {
+        title: 'Materi Lengkap',
+        description: 'Pembahasan mendalam tentang proses pembentukan dan pengolahan minyak bumi',
+        icon: '📚',
+        color: 'from-blue-500 to-cyan-500'
+      },
+      {
+        title: 'Simulasi Interaktif',
+        description: 'Eksplorasi proses destilasi bertingkat secara virtual dan interaktif',
+        icon: '🔬',
+        color: 'from-teal-500 to-green-500'
+      },
+      {
+        title: 'Fun Facts Menarik',
+        description: 'Fakta-fakta unik dan menarik seputar industri minyak bumi',
+        icon: '💡',
+        color: 'from-cyan-500 to-blue-500'
+      },
+      {
+        title: 'Kuis Interaktif',
+        description: 'Uji pemahaman Anda dengan berbagai jenis soal yang menantang',
+        icon: '✏️',
+        color: 'from-indigo-500 to-purple-500'
+      },
+      {
+        title: 'Glosarium Lengkap',
+        description: 'Kamus istilah-istilah penting dalam industri perminyakan',
+        icon: '📖',
+        color: 'from-green-500 to-teal-500'
+      },
+      {
+        title: 'Ringkasan Praktis',
+        description: 'Rangkuman materi yang mudah dipahami untuk pembelajaran efektif',
+        icon: '📋',
+        color: 'from-purple-500 to-pink-500'
+      }
+    ];
+
+    function createApp() {
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const bgColor = config.background_color || defaultConfig.background_color;
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_action || defaultConfig.primary_action;
+      const secondaryColor = config.secondary_action || defaultConfig.secondary_action;
+
+      // PERBAIKAN 2: Logic navigasi diperbaiki untuk menggunakan item.page
+      return `
+        <div class="w-full min-h-full" style="background-color: ${bgColor}; color: ${textColor}; font-family: '${customFont}', sans-serif;">
+          <header class="w-full" style="background-color: ${surfaceColor}; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+              <h1 style="font-size: ${baseSize * 1.5}px; font-weight: 700; color: ${textColor};">
+                ${config.site_title || defaultConfig.site_title}
+              </h1>
+            </div>
+          </header>
+
+          <nav class="w-full" style="background-color: ${surfaceColor}; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div class="flex items-center justify-center space-x-1 overflow-x-auto py-3">
+                ${menuItems.map(item => `
+                  <a href="${item.page ? item.page : '#'}" 
+                     class="nav-link px-4 py-2 rounded-lg whitespace-nowrap flex items-center space-x-2"
+                     style="font-size: ${baseSize * 0.9}px; color: ${item.active ? primaryColor : textColor}; font-weight: ${item.active ? '600' : '400'};">
+                    <span style="font-size: ${baseSize * 1.2}px;">${item.icon}</span>
+                    <span>${item.name}</span>
+                  </a>
+                `).join('')}
+              </div>
+            </div>
+          </nav>
+
+          <section class="w-full gradient-bg py-20 px-4">
+            <div class="max-w-7xl mx-auto">
+              <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="text-left space-y-6">
+                  <h2 style="font-size: ${baseSize * 2.5}px; font-weight: 700; line-height: 1.2; color: ${textColor};">
+                    ${config.hero_title || defaultConfig.hero_title}
+                  </h2>
+                  <p style="font-size: ${baseSize * 1.1}px; line-height: 1.6; color: ${textColor}; opacity: 0.9;">
+                    ${config.hero_description || defaultConfig.hero_description}
+                  </p>
+                  <a href="hal2.html" class="inline-block btn-hover px-8 py-4 rounded-full font-semibold"
+                          style="background-color: ${primaryColor}; color: ${textColor}; font-size: ${baseSize}px; text-decoration: none;">
+                    ${config.cta_button || defaultConfig.cta_button} →
+                  </a>
+                </div>
+                
+                <div class="hero-illustration">
+                  <svg viewBox="0 0 400 400" class="w-full h-auto">
+                    <defs>
+                      <linearGradient id="skyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#1e3a8a;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#0e7490;stop-opacity:1" />
+                      </linearGradient>
+                    </defs>
+                    
+                    <rect width="400" height="400" fill="url(#skyGradient)"/>
+                    
+                    <ellipse cx="200" cy="350" rx="180" ry="30" fill="#334155" opacity="0.6"/>
+                    
+                    <rect x="160" y="280" width="80" height="70" fill="#475569" rx="4"/>
+                    <rect x="165" y="285" width="70" height="60" fill="#64748b" rx="2"/>
+                    
+                    <rect x="185" y="120" width="30" height="160" fill="#71717a" rx="2"/>
+                    <rect x="188" y="120" width="24" height="160" fill="#94a3b8" rx="1"/>
+                    
+                    <rect x="175" y="180" width="50" height="4" fill="#475569"/>
+                    <rect x="175" y="220" width="50" height="4" fill="#475569"/>
+                    <rect x="175" y="260" width="50" height="4" fill="#475569"/>
+                    
+                    <rect x="170" y="110" width="60" height="15" fill="#64748b" rx="2"/>
+                    
+                    <polygon points="200,80 190,110 210,110" fill="#94a3b8"/>
+                    
+                    <circle cx="140" cy="200" r="8" fill="#14b8a6" opacity="0.7">
+                      <animate attributeName="cy" values="200;340;200" dur="3s" repeatCount="indefinite"/>
+                      <animate attributeName="opacity" values="0.7;0;0.7" dur="3s" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="260" cy="240" r="6" fill="#14b8a6" opacity="0.7">
+                      <animate attributeName="cy" values="240;340;240" dur="4s" repeatCount="indefinite"/>
+                      <animate attributeName="opacity" values="0.7;0;0.7" dur="4s" repeatCount="indefinite"/>
+                    </circle>
+                    
+                    <rect x="220" y="280" width="40" height="8" fill="#71717a" rx="4"/>
+                    <rect x="140" y="290" width="40" height="8" fill="#71717a" rx="4"/>
+                    
+                    <ellipse cx="320" cy="310" rx="40" ry="45" fill="#64748b"/>
+                    <ellipse cx="320" cy="310" rx="35" ry="40" fill="#94a3b8"/>
+                    <rect x="285" y="310" width="70" height="40" fill="#64748b"/>
+                    <rect x="290" y="310" width="60" height="40" fill="#94a3b8"/>
+                    <ellipse cx="320" cy="350" rx="40" ry="10" fill="#475569"/>
+                    
+                    <ellipse cx="80" cy="320" rx="25" ry="30" fill="#64748b"/>
+                    <ellipse cx="80" cy="320" rx="22" ry="27" fill="#94a3b8"/>
+                    <rect x="58" y="320" width="44" height="30" fill="#64748b"/>
+                    <rect x="60" y="320" width="40" height="30" fill="#94a3b8"/>
+                    <ellipse cx="80" cy="350" rx="25" ry="8" fill="#475569"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="w-full py-20 px-4">
+            <div class="max-w-7xl mx-auto">
+              <div class="text-center mb-12">
+                <h3 style="font-size: ${baseSize * 2}px; font-weight: 700; color: ${textColor}; margin-bottom: 16px;">
+                  Fitur Website
+                </h3>
+                <p style="font-size: ${baseSize * 1.1}px; color: ${textColor}; opacity: 0.8;">
+                  Berbagai fitur menarik untuk membantu pembelajaran Anda
+                </p>
+              </div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                ${features.map(feature => `
+                  <div class="card-hover rounded-2xl p-6" 
+                       style="background: linear-gradient(135deg, ${surfaceColor} 0%, ${surfaceColor}dd 100%); border: 1px solid rgba(255, 255, 255, 0.1);">
+                    <div class="w-16 h-16 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-4"
+                         style="font-size: ${baseSize * 2}px;">
+                      ${feature.icon}
+                    </div>
+                    <h4 style="font-size: ${baseSize * 1.25}px; font-weight: 600; color: ${textColor}; margin-bottom: 8px;">
+                      ${feature.title}
+                    </h4>
+                    <p style="font-size: ${baseSize * 0.9}px; color: ${textColor}; opacity: 0.8; line-height: 1.6;">
+                      ${feature.description}
+                    </p>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </section>
+
+          <footer class="w-full py-8 px-4" style="background-color: ${surfaceColor}; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+            <div class="max-w-7xl mx-auto text-center">
+              <p style="font-size: ${baseSize * 0.9}px; color: ${textColor}; opacity: 0.7;">
+                ${config.copyright_text || defaultConfig.copyright_text}
+              </p>
+            </div>
+          </footer>
+        </div>
+      `;
+    }
+
+    async function onConfigChange(newConfig) {
+      config = { ...config, ...newConfig };
+      const app = document.getElementById('app');
+      if (app) {
+        app.innerHTML = createApp();
+      }
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [
+          {
+            get: () => config.background_color || defaultConfig.background_color,
+            set: (value) => {
+              config.background_color = value;
+              window.elementSdk.setConfig({ background_color: value });
+            }
+          },
+          {
+            get: () => config.surface_color || defaultConfig.surface_color,
+            set: (value) => {
+              config.surface_color = value;
+              window.elementSdk.setConfig({ surface_color: value });
+            }
+          },
+          {
+            get: () => config.text_color || defaultConfig.text_color,
+            set: (value) => {
+              config.text_color = value;
+              window.elementSdk.setConfig({ text_color: value });
+            }
+          },
+          {
+            get: () => config.primary_action || defaultConfig.primary_action,
+            set: (value) => {
+              config.primary_action = value;
+              window.elementSdk.setConfig({ primary_action: value });
+            }
+          },
+          {
+            get: () => config.secondary_action || defaultConfig.secondary_action,
+            set: (value) => {
+              config.secondary_action = value;
+              window.elementSdk.setConfig({ secondary_action: value });
+            }
+          }
+        ],
+        borderables: [],
+        fontEditable: {
+          get: () => config.font_family || defaultConfig.font_family,
+          set: (value) => {
+            config.font_family = value;
+            window.elementSdk.setConfig({ font_family: value });
+          }
+        },
+        fontSizeable: {
+          get: () => config.font_size || defaultConfig.font_size,
+          set: (value) => {
+            config.font_size = value;
+            window.elementSdk.setConfig({ font_size: value });
+          }
+        }
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ["site_title", config.site_title || defaultConfig.site_title],
+        ["hero_title", config.hero_title || defaultConfig.hero_title],
+        ["hero_description", config.hero_description || defaultConfig.hero_description],
+        ["cta_button", config.cta_button || defaultConfig.cta_button],
+        ["copyright_text", config.copyright_text || defaultConfig.copyright_text]
+      ]);
+    }
+
+    async function init() {
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig,
+          onConfigChange,
+          mapToCapabilities,
+          mapToEditPanelValues
+        });
+        
+        config = window.elementSdk.config;
+      }
+      
+      const app = document.getElementById('app');
+      if (app) {
+        app.innerHTML = createApp();
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+ </body>
+</html>
