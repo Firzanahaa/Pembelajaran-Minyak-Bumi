@@ -1,0 +1,987 @@
+<!doctype html>
+<html lang="id">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Glosarium Minyak Bumi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+    
+    * {
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .sticky-header {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      backdrop-filter: blur(10px);
+    }
+    
+    .sticky-sidebar {
+      position: sticky;
+      top: 180px;
+      max-height: calc(100% - 200px);
+      overflow-y: auto;
+    }
+    
+    .term-card {
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .term-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+    }
+    
+    .term-card.expanded {
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+    }
+    
+    .highlight {
+      background: linear-gradient(180deg, transparent 60%, #fbbf24 60%);
+      font-weight: 600;
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.4s ease;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .alphabet-btn {
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .alphabet-btn.active {
+      transform: scale(1.15);
+      font-weight: 700;
+    }
+    
+    .alphabet-btn:hover {
+      transform: scale(1.1);
+    }
+    
+    .category-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .bookmark-icon {
+      transition: all 0.3s ease;
+    }
+    
+    .bookmark-icon.active {
+      animation: bookmarkPop 0.4s ease;
+    }
+    
+    @keyframes bookmarkPop {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+    }
+    
+    .related-link {
+      transition: all 0.2s ease;
+    }
+    
+    .related-link:hover {
+      transform: translateX(4px);
+    }
+    
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      .term-card {
+        page-break-inside: avoid;
+        box-shadow: none !important;
+        border: 1px solid #333 !important;
+      }
+    }
+    
+    .search-container {
+      position: relative;
+    }
+    
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+    
+    input[type="search"]::-webkit-search-cancel-button {
+      display: none;
+    }
+    
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: rgba(251, 191, 36, 0.5);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(251, 191, 36, 0.8);
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="min-h-full">
+  <div id="app" class="w-full min-h-full"></div>
+  <script>
+    const defaultConfig = {
+      page_title: "Glosarium Minyak Bumi",
+      page_subtitle: "Kamus Istilah Lengkap Pembelajaran Minyak Bumi",
+      search_placeholder: "Cari istilah...",
+      clear_button: "✕ Clear",
+      all_categories: "🌟 Semua",
+      chemistry_category: "🧪 Kimia",
+      industry_category: "🏭 Industri",
+      environment_category: "🌱 Lingkungan",
+      print_button: "🖨️ Cetak",
+      back_button: "← Kembali ke Beranda",
+      background_color: "#0f172a",
+      surface_color: "#1e293b",
+      text_color: "#f1f5f9",
+      primary_action: "#fbbf24",
+      secondary_action: "#14b8a6",
+      font_family: "Poppins",
+      font_size: 16
+    };
+
+    let config = { ...defaultConfig };
+    let searchQuery = '';
+    let activeCategory = 'all';
+    let expandedTerms = new Set();
+    let bookmarkedTerms = new Set();
+    let activeAlphabet = '';
+
+    const glossaryTerms = [
+      {
+        id: 1,
+        term: "Alkana",
+        letter: "A",
+        category: "chemistry",
+        definition: "Hidrokarbon jenuh dengan ikatan tunggal antara atom karbon.",
+        fullDefinition: "Alkana adalah senyawa hidrokarbon alifatik jenuh dengan rumus umum CnH2n+2, di mana semua ikatan karbon-karbon adalah ikatan tunggal (sigma). Contoh: metana (CH₄), etana (C₂H₆), propana (C₃H₈).",
+        etymology: "Dari bahasa Latin 'alkali' (abu) dan sufiks '-ane' untuk hidrokarbon jenuh",
+        related: ["Hidrokarbon", "Fraksi", "Crude Oil"]
+      },
+      {
+        id: 2,
+        term: "Aspal",
+        letter: "A",
+        category: "industry",
+        definition: "Residu hitam kental dari destilasi minyak bumi, digunakan untuk perkerasan jalan.",
+        fullDefinition: "Aspal adalah fraksi terberat dari destilasi minyak bumi dengan rantai karbon >C30, berbentuk semi-padat hingga padat pada suhu ruang. Digunakan terutama untuk konstruksi jalan, atap waterproofing, dan isolasi.",
+        etymology: "Dari bahasa Yunani 'asphaltos' yang berarti 'aman'",
+        related: ["Destilasi", "Fraksi", "Viskositas"]
+      },
+      {
+        id: 3,
+        term: "Bioremediasi",
+        letter: "B",
+        category: "environment",
+        definition: "Penggunaan mikroorganisme untuk membersihkan pencemaran minyak di lingkungan.",
+        fullDefinition: "Bioremediasi adalah teknologi pembersihan lingkungan yang memanfaatkan kemampuan mikroorganisme (bakteri, fungi, alga) untuk menguraikan dan memetabolisme kontaminan minyak bumi menjadi senyawa yang kurang berbahaya atau tidak berbahaya.",
+        etymology: "Dari 'bio-' (kehidupan) dan 'remediasi' (perbaikan)",
+        related: ["Emisi", "Pencemaran", "Fossil Fuel"]
+      },
+      {
+        id: 4,
+        term: "Bensin",
+        letter: "B",
+        category: "industry",
+        definition: "Fraksi minyak bumi dengan C5-C12 untuk bahan bakar kendaraan bermotor.",
+        fullDefinition: "Bensin (gasoline) adalah campuran hidrokarbon cair dengan rantai karbon C5-C12 dan titik didih 30-200°C. Digunakan sebagai bahan bakar mesin pembakaran internal dengan sistem pengapian busi (spark ignition).",
+        etymology: "Dari bahasa Arab 'benzene'",
+        related: ["Oktana", "Reforming", "Fraksi"]
+      },
+      {
+        id: 5,
+        term: "Cracking",
+        letter: "C",
+        category: "chemistry",
+        definition: "Pemecahan molekul hidrokarbon besar menjadi molekul lebih kecil.",
+        fullDefinition: "Cracking adalah proses memecah molekul hidrokarbon rantai panjang menjadi molekul rantai pendek yang lebih berguna (seperti bensin). Ada dua jenis: thermal cracking (menggunakan panas tinggi) dan catalytic cracking (menggunakan katalis).",
+        etymology: "Dari bahasa Inggris 'to crack' (memecah)",
+        related: ["Reforming", "Destilasi", "Bensin"]
+      },
+      {
+        id: 6,
+        term: "Crude Oil",
+        letter: "C",
+        category: "industry",
+        definition: "Minyak mentah yang belum diolah, langsung dari sumur bor.",
+        fullDefinition: "Crude oil (minyak mentah) adalah campuran kompleks dari berbagai hidrokarbon yang diekstrak langsung dari reservoir bawah tanah. Komposisinya bervariasi tergantung lokasi, mengandung alkana, sikloalkana, aromatik, dan senyawa organik lainnya.",
+        etymology: "Dari bahasa Latin 'crudus' (mentah, tidak diolah)",
+        related: ["Petroleum", "Destilasi", "Reservoir"]
+      },
+      {
+        id: 7,
+        term: "Destilasi",
+        letter: "D",
+        category: "chemistry",
+        definition: "Pemisahan campuran berdasarkan perbedaan titik didih komponen.",
+        fullDefinition: "Destilasi bertingkat adalah metode utama pemurnian minyak mentah di kilang. Minyak dipanaskan dalam menara destilasi, komponen dengan titik didih rendah menguap lebih dulu dan naik ke atas menara, sementara komponen berat mengendap di bawah.",
+        etymology: "Dari bahasa Latin 'destillare' (meneteskan turun)",
+        related: ["Fraksi", "Kilang", "Refinery"]
+      },
+      {
+        id: 8,
+        term: "Emisi",
+        letter: "E",
+        category: "environment",
+        definition: "Gas buang hasil pembakaran bahan bakar, termasuk CO₂ dan polutan.",
+        fullDefinition: "Emisi adalah pelepasan gas atau partikel ke atmosfer dari proses pembakaran bahan bakar fosil. Emisi utama meliputi CO₂ (gas rumah kaca), CO, NOx, SO₂, dan partikel halus yang berkontribusi pada polusi udara dan perubahan iklim.",
+        etymology: "Dari bahasa Latin 'emittere' (mengirim keluar)",
+        related: ["Fossil Fuel", "Bioremediasi", "Pencemaran"]
+      },
+      {
+        id: 9,
+        term: "Fraksi",
+        letter: "F",
+        category: "chemistry",
+        definition: "Kelompok senyawa hidrokarbon dengan rentang titik didih tertentu.",
+        fullDefinition: "Fraksi adalah hasil pemisahan minyak mentah berdasarkan titik didih dalam proses destilasi. Fraksi utama: gas petroleum (C1-C4), bensin (C5-C12), kerosin (C12-C16), solar (C15-C18), oli pelumas (C20-C30), dan aspal (>C30).",
+        etymology: "Dari bahasa Latin 'fractio' (bagian yang dipecah)",
+        related: ["Destilasi", "Bensin", "Kerosin"]
+      },
+      {
+        id: 10,
+        term: "Fossil Fuel",
+        letter: "F",
+        category: "environment",
+        definition: "Bahan bakar fosil yang terbentuk dari organisme purba jutaan tahun lalu.",
+        fullDefinition: "Fossil fuel adalah sumber energi tidak terbarukan yang terbentuk dari sisa-sisa organisme yang terdekomposisi selama jutaan tahun di bawah tekanan dan panas tinggi. Meliputi minyak bumi, gas alam, dan batu bara. Sumber energi utama dunia namun penyumbang emisi karbon terbesar.",
+        etymology: "Dari 'fossil' (sisa organisme purba) dan 'fuel' (bahan bakar)",
+        related: ["Petroleum", "Crude Oil", "Emisi"]
+      },
+      {
+        id: 11,
+        term: "Hidrokarbon",
+        letter: "H",
+        category: "chemistry",
+        definition: "Senyawa organik yang hanya terdiri dari atom hidrogen dan karbon.",
+        fullDefinition: "Hidrokarbon adalah senyawa kimia yang tersusun dari atom hidrogen (H) dan karbon (C) saja. Merupakan komponen utama minyak bumi dan gas alam. Dibagi menjadi hidrokarbon alifatik (rantai lurus/bercabang) dan aromatik (struktur cincin).",
+        etymology: "Dari 'hidro-' (hidrogen) dan 'karbon'",
+        related: ["Alkana", "Petroleum", "Crude Oil"]
+      },
+      {
+        id: 12,
+        term: "Kerosin",
+        letter: "K",
+        category: "industry",
+        definition: "Fraksi minyak bumi C12-C16 untuk bahan bakar jet dan lampu.",
+        fullDefinition: "Kerosin (aviation turbine fuel/Avtur) adalah fraksi minyak bumi dengan rantai karbon C12-C16 dan titik didih 150-275°C. Digunakan sebagai bahan bakar pesawat jet, lampu, pemanas ruangan, dan kompor.",
+        etymology: "Dari bahasa Yunani 'keros' (lilin)",
+        related: ["Fraksi", "Bensin", "Solar"]
+      },
+      {
+        id: 13,
+        term: "Kilang",
+        letter: "K",
+        category: "industry",
+        definition: "Fasilitas industri untuk mengolah dan memurnikan minyak mentah.",
+        fullDefinition: "Kilang minyak (oil refinery) adalah kompleks industri petrokimia yang mengubah minyak mentah menjadi produk yang dapat digunakan seperti bensin, diesel, kerosin, dan petrokimia melalui berbagai proses seperti destilasi, cracking, reforming, dan blending.",
+        etymology: "Dari bahasa Melayu 'kilang' (pabrik)",
+        related: ["Refinery", "Destilasi", "Cracking"]
+      },
+      {
+        id: 14,
+        term: "LPG",
+        letter: "L",
+        category: "industry",
+        definition: "Liquefied Petroleum Gas - gas minyak bumi yang dicairkan untuk kemudahan penyimpanan.",
+        fullDefinition: "LPG adalah campuran gas hidrokarbon (terutama propana C3H8 dan butana C4H10) yang dicairkan pada tekanan rendah. Digunakan sebagai bahan bakar masak, pemanas, dan kendaraan. LPG lebih bersih dari bahan bakar cair.",
+        etymology: "Akronim dari 'Liquefied Petroleum Gas'",
+        related: ["Fraksi", "Gas Petroleum", "Propana"]
+      },
+      {
+        id: 15,
+        term: "Oktana",
+        letter: "O",
+        category: "chemistry",
+        definition: "Ukuran kualitas bensin berdasarkan resistensi terhadap knocking.",
+        fullDefinition: "Bilangan oktana adalah ukuran kemampuan bensin untuk menahan pembakaran prematur (knocking/ketukan) dalam mesin. Makin tinggi bilangan oktana (misalnya RON 92, 95, 98), makin baik kualitas bensin dan makin tahan terhadap knocking.",
+        etymology: "Dari 'oktana' (C8H18), senyawa referensi dengan nilai 100",
+        related: ["Bensin", "Reforming", "Kualitas"]
+      },
+      {
+        id: 16,
+        term: "OPEC",
+        letter: "O",
+        category: "industry",
+        definition: "Organization of Petroleum Exporting Countries - organisasi negara pengekspor minyak.",
+        fullDefinition: "OPEC adalah organisasi internasional yang didirikan tahun 1960 untuk mengkoordinasikan kebijakan produksi minyak anggotanya dan menstabilkan harga minyak global. Anggota termasuk Arab Saudi, Iran, Irak, Kuwait, Venezuela, dan lainnya.",
+        etymology: "Akronim dari 'Organization of Petroleum Exporting Countries'",
+        related: ["Petroleum", "Crude Oil", "Produksi"]
+      },
+      {
+        id: 17,
+        term: "Petroleum",
+        letter: "P",
+        category: "industry",
+        definition: "Istilah lain untuk minyak bumi - cairan hidrokarbon alami.",
+        fullDefinition: "Petroleum adalah istilah umum untuk minyak bumi, campuran hidrokarbon cair yang terbentuk secara alami di dalam batuan sedimen bawah tanah. Berasal dari dekomposisi organisme laut jutaan tahun lalu melalui proses diagenesis dan katagenesis.",
+        etymology: "Dari bahasa Latin 'petra' (batu) dan 'oleum' (minyak)",
+        related: ["Crude Oil", "Fossil Fuel", "Hidrokarbon"]
+      },
+      {
+        id: 18,
+        term: "Polimer",
+        letter: "P",
+        category: "chemistry",
+        definition: "Molekul besar yang terbentuk dari pengulangan unit molekul kecil (monomer).",
+        fullDefinition: "Polimer adalah makromolekul yang terdiri dari banyak unit berulang (monomer) yang terhubung melalui ikatan kimia. Banyak polimer sintetik (plastik, karet sintetis, nilon) dibuat dari monomer yang berasal dari pengolahan minyak bumi.",
+        etymology: "Dari bahasa Yunani 'poly' (banyak) dan 'meros' (bagian)",
+        related: ["Petrokimia", "Plastik", "Monomer"]
+      },
+      {
+        id: 19,
+        term: "Reforming",
+        letter: "R",
+        category: "chemistry",
+        definition: "Proses mengubah struktur hidrokarbon untuk meningkatkan kualitas dan oktana.",
+        fullDefinition: "Reforming adalah proses katalitik untuk mengubah struktur molekul hidrokarbon (misalnya dari rantai lurus menjadi bercabang atau aromatik) untuk meningkatkan bilangan oktana bensin. Catalytic reforming menggunakan katalis platinum atau platinum-rhenium pada suhu 500°C.",
+        etymology: "Dari 're-' (kembali) dan 'forming' (membentuk)",
+        related: ["Cracking", "Oktana", "Bensin"]
+      },
+      {
+        id: 20,
+        term: "Refinery",
+        letter: "R",
+        category: "industry",
+        definition: "Pabrik pengolahan yang memurnikan minyak mentah menjadi produk berguna.",
+        fullDefinition: "Refinery (kilang minyak) adalah fasilitas industri kompleks yang memproses minyak mentah melalui berbagai unit seperti atmospheric distillation, vacuum distillation, catalytic cracking, reforming, hydrocracking untuk menghasilkan produk seperti bensin, diesel, jet fuel, dan petrokimia.",
+        etymology: "Dari 'refine' (memurnikan) dan sufiks '-ery' (tempat)",
+        related: ["Kilang", "Destilasi", "Cracking"]
+      },
+      {
+        id: 21,
+        term: "Reservoir",
+        letter: "R",
+        category: "industry",
+        definition: "Lapisan batuan berpori di bawah tanah yang menyimpan akumulasi minyak bumi.",
+        fullDefinition: "Reservoir minyak adalah batuan berpori dan permeabel (biasanya batu pasir atau karbonat) yang terperangkap oleh lapisan batuan kedap (seal rock) sehingga minyak dan gas terakumulasi. Minyak mengisi ruang pori batuan seperti spons menyerap air.",
+        etymology: "Dari bahasa Prancis 'réservoir' (tempat penyimpanan)",
+        related: ["Crude Oil", "Sumur", "Eksplorasi"]
+      },
+      {
+        id: 22,
+        term: "Solar",
+        letter: "S",
+        category: "industry",
+        definition: "Fraksi minyak bumi C15-C18 untuk bahan bakar mesin diesel.",
+        fullDefinition: "Solar (diesel fuel) adalah fraksi minyak bumi dengan rantai karbon C15-C18 dan titik didih 250-350°C. Digunakan untuk mesin diesel yang menggunakan sistem pembakaran kompresi (compression ignition) tanpa busi. Lebih efisien dari bensin.",
+        etymology: "Singkatan dari 'gas oil' atau disebut juga 'diesel oil'",
+        related: ["Fraksi", "Bensin", "Kerosin"]
+      },
+      {
+        id: 23,
+        term: "Viskositas",
+        letter: "V",
+        category: "chemistry",
+        definition: "Ukuran kekentalan atau resistensi cairan terhadap aliran.",
+        fullDefinition: "Viskositas adalah sifat fisik yang mengukur ketahanan cairan untuk mengalir. Minyak mentah dengan viskositas tinggi (berat) lebih sulit dipompa dan diolah dibandingkan minyak ringan. Viskositas berkurang dengan peningkatan suhu.",
+        etymology: "Dari bahasa Latin 'viscosus' (lengket)",
+        related: ["Aspal", "Crude Oil", "Properti Fisik"]
+      },
+      {
+        id: 24,
+        term: "Sumur Minyak",
+        letter: "S",
+        category: "industry",
+        definition: "Lubang bor yang dibuat untuk mengekstrak minyak atau gas dari reservoir bawah tanah.",
+        fullDefinition: "Sumur minyak adalah lubang yang dibor vertikal atau horizontal ke dalam reservoir minyak untuk mengekstraksi minyak mentah dan gas alam. Kedalaman sumur bisa mencapai 1-5 km atau lebih. Menggunakan teknologi seperti directional drilling dan hydraulic fracturing.",
+        etymology: "Dari bahasa Indonesia 'sumur' (lubang galian untuk air/minyak)",
+        related: ["Reservoir", "Eksplorasi", "Crude Oil"]
+      },
+      {
+        id: 25,
+        term: "Petrokimia",
+        letter: "P",
+        category: "chemistry",
+        definition: "Produk kimia yang dibuat dari minyak bumi dan gas alam.",
+        fullDefinition: "Petrokimia adalah bahan kimia yang diproduksi dari minyak bumi dan gas alam sebagai bahan baku. Contoh: etilena, propilena, benzena, toluena yang digunakan untuk membuat plastik, karet sintetis, serat sintetis, detergen, pestisida, pupuk, dan obat-obatan.",
+        etymology: "Dari 'petro-' (minyak bumi) dan 'kimia'",
+        related: ["Polimer", "Plastik", "Petroleum"]
+      },
+      {
+        id: 26,
+        term: "Eksplorasi",
+        letter: "E",
+        category: "industry",
+        definition: "Kegiatan pencarian cadangan minyak dan gas bumi baru.",
+        fullDefinition: "Eksplorasi minyak adalah proses mencari dan mengevaluasi potensi cadangan minyak menggunakan teknologi geologi, geofisika (seismik 2D/3D), pengeboran eksplorasi, dan analisis batuan. Tahap awal sebelum produksi komersial dimulai.",
+        etymology: "Dari bahasa Latin 'explorare' (mencari, menyelidiki)",
+        related: ["Reservoir", "Sumur Minyak", "Produksi"]
+      },
+      {
+        id: 27,
+        term: "Pengolahan Hilir",
+        letter: "P",
+        category: "industry",
+        definition: "Kegiatan pengolahan minyak mentah menjadi produk jadi di kilang.",
+        fullDefinition: "Pengolahan hilir (downstream) adalah segmen industri minyak yang meliputi pemurnian minyak mentah di kilang, distribusi produk, dan pemasaran. Mencakup kilang minyak, terminal penyimpanan, stasiun pengisian bahan bakar (SPBU), dan penjualan petrokimia.",
+        etymology: "Dari 'hilir' (bagian sungai yang lebih rendah, menuju muara)",
+        related: ["Kilang", "Refinery", "Pengolahan Hulu"]
+      },
+      {
+        id: 28,
+        term: "Pengolahan Hulu",
+        letter: "P",
+        category: "industry",
+        definition: "Kegiatan pencarian dan produksi minyak mentah dari sumur.",
+        fullDefinition: "Pengolahan hulu (upstream) adalah segmen industri minyak yang meliputi eksplorasi, pengeboran, dan produksi minyak mentah dan gas alam dari reservoir. Tahap ini menghasilkan crude oil yang kemudian dikirim ke kilang untuk diolah.",
+        etymology: "Dari 'hulu' (bagian sungai yang lebih tinggi, dekat sumber)",
+        related: ["Eksplorasi", "Sumur Minyak", "Crude Oil"]
+      },
+      {
+        id: 29,
+        term: "API Gravity",
+        letter: "A",
+        category: "chemistry",
+        definition: "Ukuran standar industri untuk berat jenis minyak mentah.",
+        fullDefinition: "API Gravity (American Petroleum Institute Gravity) adalah skala untuk mengukur berat jenis minyak mentah relatif terhadap air. Minyak ringan memiliki API gravity tinggi (>31°API), sedangkan minyak berat memiliki API gravity rendah (<22°API). Makin tinggi API gravity, makin berharga minyaknya.",
+        etymology: "Standar dari American Petroleum Institute",
+        related: ["Crude Oil", "Viskositas", "Kualitas"]
+      },
+      {
+        id: 30,
+        term: "Pencemaran Minyak",
+        letter: "P",
+        category: "environment",
+        definition: "Pelepasan minyak ke lingkungan yang merusak ekosistem.",
+        fullDefinition: "Pencemaran minyak terjadi ketika minyak mentah atau produk minyak tumpah ke lingkungan (laut, sungai, tanah) akibat kecelakaan kapal tanker, kebocoran pipa, atau ledakan sumur. Merusak ekosistem, membunuh organisme laut, dan mencemari air. Ditangani dengan bioremediasi, dispersan, atau pembersihan mekanis.",
+        etymology: "Dari 'cemar' (kotor, tercemar)",
+        related: ["Bioremediasi", "Emisi", "Lingkungan"]
+      }
+    ];
+
+    function getBookmarkedTerms() {
+      try {
+        const saved = localStorage.getItem('glossary_bookmarks');
+        return saved ? new Set(JSON.parse(saved)) : new Set();
+      } catch {
+        return new Set();
+      }
+    }
+
+    function saveBookmarks() {
+      try {
+        localStorage.setItem('glossary_bookmarks', JSON.stringify([...bookmarkedTerms]));
+      } catch (e) {
+        console.error('Failed to save bookmarks');
+      }
+    }
+
+    function toggleBookmark(termId) {
+      if (bookmarkedTerms.has(termId)) {
+        bookmarkedTerms.delete(termId);
+      } else {
+        bookmarkedTerms.add(termId);
+      }
+      saveBookmarks();
+      updateUI();
+    }
+
+    function toggleExpand(termId) {
+      if (expandedTerms.has(termId)) {
+        expandedTerms.delete(termId);
+      } else {
+        expandedTerms.add(termId);
+      }
+      updateUI();
+    }
+
+    function filterTerms() {
+      let filtered = glossaryTerms;
+
+      if (activeCategory !== 'all') {
+        filtered = filtered.filter(term => term.category === activeCategory);
+      }
+
+      if (searchQuery.trim()) {
+        const query = searchQuery.toLowerCase();
+        filtered = filtered.filter(term => 
+          term.term.toLowerCase().includes(query) || 
+          term.definition.toLowerCase().includes(query) ||
+          term.fullDefinition.toLowerCase().includes(query)
+        );
+      }
+
+      return filtered.sort((a, b) => a.term.localeCompare(b.term));
+    }
+
+    function highlightText(text, query) {
+      if (!query.trim()) return text;
+      
+      const regex = new RegExp(`(${query})`, 'gi');
+      return text.replace(regex, '<span class="highlight">$1</span>');
+    }
+
+    function scrollToLetter(letter) {
+      activeAlphabet = letter;
+      updateUI();
+      
+      setTimeout(() => {
+        const element = document.getElementById(`letter-${letter}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    }
+
+    function handleSearch(value) {
+      searchQuery = value;
+      activeAlphabet = '';
+      updateUI();
+    }
+
+    function clearSearch() {
+      searchQuery = '';
+      activeAlphabet = '';
+      activeCategory = 'all';
+      updateUI();
+    }
+
+    function setCategory(category) {
+      activeCategory = category;
+      updateUI();
+    }
+
+    function printGlossary() {
+      window.print();
+    }
+
+    function getCategoryColor(category) {
+      const colors = {
+        chemistry: { bg: '#3b82f633', border: '#3b82f6', text: '#3b82f6' },
+        industry: { bg: '#10b98133', border: '#10b981', text: '#10b981' },
+        environment: { bg: '#f59e0b33', border: '#f59e0b', text: '#f59e0b' }
+      };
+      return colors[category] || colors.chemistry;
+    }
+
+    function getCategoryLabel(category) {
+      const labels = {
+        chemistry: '🧪 Kimia',
+        industry: '🏭 Industri',
+        environment: '🌱 Lingkungan'
+      };
+      return labels[category] || category;
+    }
+
+    function groupByLetter(terms) {
+      const grouped = {};
+      terms.forEach(term => {
+        if (!grouped[term.letter]) {
+          grouped[term.letter] = [];
+        }
+        grouped[term.letter].push(term);
+      });
+      return grouped;
+    }
+
+    function createApp() {
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const bgColor = config.background_color || defaultConfig.background_color;
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_action || defaultConfig.primary_action;
+      const secondaryColor = config.secondary_action || defaultConfig.secondary_action;
+
+      const filteredTerms = filterTerms();
+      const groupedTerms = groupByLetter(filteredTerms);
+      const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+      return `
+        <div class="w-full min-h-full" style="background-color: ${bgColor}; color: ${textColor}; font-family: '${customFont}', sans-serif;">
+          <!-- Header -->
+          <header class="sticky-header no-print w-full" style="background-color: ${surfaceColor}88;">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+              <div class="flex items-center justify-between mb-6">
+                <button onclick="window.history.back()" 
+                        class="hover:opacity-80 transition-opacity"
+                        style="color: ${primaryColor}; font-size: ${baseSize * 0.9}px; font-weight: 600;">
+                  ${config.back_button || defaultConfig.back_button}
+                </button>
+                <button onclick="printGlossary()" 
+                        class="px-4 py-2 rounded-lg transition-all hover:scale-105"
+                        style="background-color: ${surfaceColor}; border: 2px solid ${secondaryColor}; color: ${secondaryColor}; font-size: ${baseSize * 0.9}px; font-weight: 600;">
+                  ${config.print_button || defaultConfig.print_button}
+                </button>
+              </div>
+
+              <div class="text-center mb-6">
+                <h1 style="font-size: ${baseSize * 2.5}px; font-weight: 800; color: ${textColor}; margin-bottom: 8px;">
+                  📚 ${config.page_title || defaultConfig.page_title}
+                </h1>
+                <p style="font-size: ${baseSize * 1.1}px; color: ${textColor}; opacity: 0.8;">
+                  ${config.page_subtitle || defaultConfig.page_subtitle}
+                </p>
+              </div>
+
+              <!-- Search Bar -->
+              <div class="search-container max-w-2xl mx-auto mb-6">
+                <div class="search-icon" style="color: ${primaryColor}; font-size: ${baseSize * 1.5}px;">
+                  🔍
+                </div>
+                <input 
+                  type="search"
+                  value="${searchQuery}"
+                  oninput="handleSearch(this.value)"
+                  placeholder="${config.search_placeholder || defaultConfig.search_placeholder}"
+                  class="w-full py-4 pl-14 pr-24 rounded-xl"
+                  style="background-color: ${surfaceColor}; border: 2px solid ${primaryColor}33; color: ${textColor}; font-size: ${baseSize}px;"
+                />
+                ${searchQuery ? `
+                  <button 
+                    onclick="clearSearch()"
+                    class="absolute right-4 top-1/2 transform -translate-y-1/2 px-3 py-1 rounded-lg transition-all hover:scale-105"
+                    style="background-color: ${primaryColor}; color: ${bgColor}; font-size: ${baseSize * 0.85}px; font-weight: 600;">
+                    ${config.clear_button || defaultConfig.clear_button}
+                  </button>
+                ` : ''}
+              </div>
+
+              <!-- Category Filters -->
+              <div class="flex flex-wrap gap-3 justify-center mb-4">
+                <button 
+                  onclick="setCategory('all')"
+                  class="px-5 py-2 rounded-full font-semibold transition-all"
+                  style="background: ${activeCategory === 'all' ? `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)` : surfaceColor}; 
+                         color: ${activeCategory === 'all' ? bgColor : textColor}; 
+                         border: 2px solid ${activeCategory === 'all' ? 'transparent' : primaryColor + '33'};
+                         font-size: ${baseSize * 0.9}px;">
+                  ${config.all_categories || defaultConfig.all_categories}
+                </button>
+                <button 
+                  onclick="setCategory('chemistry')"
+                  class="px-5 py-2 rounded-full font-semibold transition-all"
+                  style="background: ${activeCategory === 'chemistry' ? '#3b82f6' : surfaceColor}; 
+                         color: ${activeCategory === 'chemistry' ? 'white' : textColor}; 
+                         border: 2px solid ${activeCategory === 'chemistry' ? 'transparent' : '#3b82f633'};
+                         font-size: ${baseSize * 0.9}px;">
+                  ${config.chemistry_category || defaultConfig.chemistry_category}
+                </button>
+                <button 
+                  onclick="setCategory('industry')"
+                  class="px-5 py-2 rounded-full font-semibold transition-all"
+                  style="background: ${activeCategory === 'industry' ? '#10b981' : surfaceColor}; 
+                         color: ${activeCategory === 'industry' ? 'white' : textColor}; 
+                         border: 2px solid ${activeCategory === 'industry' ? 'transparent' : '#10b98133'};
+                         font-size: ${baseSize * 0.9}px;">
+                  ${config.industry_category || defaultConfig.industry_category}
+                </button>
+                <button 
+                  onclick="setCategory('environment')"
+                  class="px-5 py-2 rounded-full font-semibold transition-all"
+                  style="background: ${activeCategory === 'environment' ? '#f59e0b' : surfaceColor}; 
+                         color: ${activeCategory === 'environment' ? 'white' : textColor}; 
+                         border: 2px solid ${activeCategory === 'environment' ? 'transparent' : '#f59e0b33'};
+                         font-size: ${baseSize * 0.9}px;">
+                  ${config.environment_category || defaultConfig.environment_category}
+                </button>
+              </div>
+
+              <!-- Counter -->
+              <div class="text-center" style="font-size: ${baseSize * 0.9}px; color: ${textColor}; opacity: 0.7;">
+                Menampilkan <strong style="color: ${primaryColor};">${filteredTerms.length}</strong> dari <strong>${glossaryTerms.length}</strong> istilah
+                ${bookmarkedTerms.size > 0 ? ` • <strong style="color: ${secondaryColor};">${bookmarkedTerms.size}</strong> tersimpan` : ''}
+              </div>
+            </div>
+          </header>
+
+          <!-- Main Content -->
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex gap-8">
+              <!-- Sidebar Alphabet Navigation -->
+              <aside class="no-print hidden lg:block w-20">
+                <div class="sticky-sidebar space-y-2">
+                  ${alphabet.map(letter => {
+                    const hasTerms = groupedTerms[letter] && groupedTerms[letter].length > 0;
+                    return `
+                      <button 
+                        onclick="scrollToLetter('${letter}')"
+                        class="alphabet-btn w-12 h-12 rounded-lg flex items-center justify-center transition-all ${activeAlphabet === letter ? 'active' : ''}"
+                        style="background: ${hasTerms ? (activeAlphabet === letter ? `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)` : surfaceColor) : 'transparent'}; 
+                               color: ${hasTerms ? (activeAlphabet === letter ? bgColor : textColor) : textColor + '33'}; 
+                               border: 2px solid ${hasTerms ? (activeAlphabet === letter ? 'transparent' : primaryColor + '33') : 'transparent'};
+                               font-size: ${baseSize * 0.95}px;
+                               cursor: ${hasTerms ? 'pointer' : 'default'};"
+                        ${!hasTerms ? 'disabled' : ''}>
+                        ${letter}
+                      </button>
+                    `;
+                  }).join('')}
+                </div>
+              </aside>
+
+              <!-- Terms Grid -->
+              <main class="flex-1">
+                ${filteredTerms.length === 0 ? `
+                  <div class="text-center py-16">
+                    <div style="font-size: ${baseSize * 4}px; margin-bottom: 16px; opacity: 0.5;">🔍</div>
+                    <h3 style="font-size: ${baseSize * 1.5}px; font-weight: 700; color: ${textColor}; margin-bottom: 8px;">
+                      Tidak Ada Hasil
+                    </h3>
+                    <p style="font-size: ${baseSize}px; color: ${textColor}; opacity: 0.7;">
+                      Coba kata kunci atau filter lain
+                    </p>
+                  </div>
+                ` : Object.keys(groupedTerms).sort().map(letter => `
+                  <div id="letter-${letter}" class="mb-8">
+                    <div class="flex items-center mb-4">
+                      <div class="w-16 h-16 rounded-2xl flex items-center justify-center mr-4"
+                           style="background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%);">
+                        <span style="font-size: ${baseSize * 2}px; font-weight: 900; color: white;">
+                          ${letter}
+                        </span>
+                      </div>
+                      <div style="flex: 1; height: 3px; background: linear-gradient(90deg, ${primaryColor} 0%, transparent 100%);"></div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      ${groupedTerms[letter].map(term => {
+                        const isExpanded = expandedTerms.has(term.id);
+                        const isBookmarked = bookmarkedTerms.has(term.id);
+                        const categoryColor = getCategoryColor(term.category);
+                        
+                        return `
+                          <div class="term-card fade-in rounded-xl p-6 ${isExpanded ? 'expanded' : ''}"
+                               style="background-color: ${surfaceColor}; border: 2px solid ${categoryColor.border}33;">
+                            <div class="flex items-start justify-between mb-3">
+                              <div class="flex-1">
+                                <h3 style="font-size: ${baseSize * 1.3}px; font-weight: 700; color: ${textColor}; margin-bottom: 8px;">
+                                  ${highlightText(term.term, searchQuery)}
+                                </h3>
+                                <span class="category-badge" 
+                                      style="background-color: ${categoryColor.bg}; color: ${categoryColor.text}; border: 1px solid ${categoryColor.border};">
+                                  ${getCategoryLabel(term.category)}
+                                </span>
+                              </div>
+                              <button 
+                                onclick="toggleBookmark(${term.id})"
+                                class="bookmark-icon ml-3 ${isBookmarked ? 'active' : ''}"
+                                style="font-size: ${baseSize * 1.5}px;">
+                                ${isBookmarked ? '⭐' : '☆'}
+                              </button>
+                            </div>
+
+                            <p style="font-size: ${baseSize * 0.95}px; color: ${textColor}; opacity: 0.9; line-height: 1.6; margin-bottom: 12px;">
+                              ${highlightText(term.definition, searchQuery)}
+                            </p>
+
+                            ${isExpanded ? `
+                              <div class="mt-4 pt-4" style="border-top: 2px solid ${primaryColor}33;">
+                                <p style="font-size: ${baseSize * 0.95}px; color: ${textColor}; opacity: 0.9; line-height: 1.7; margin-bottom: 12px;">
+                                  ${highlightText(term.fullDefinition, searchQuery)}
+                                </p>
+
+                                ${term.etymology ? `
+                                  <div class="mb-3 p-3 rounded-lg" style="background-color: ${bgColor};">
+                                    <div style="font-size: ${baseSize * 0.85}px; color: ${primaryColor}; font-weight: 600; margin-bottom: 4px;">
+                                      📖 Etimologi
+                                    </div>
+                                    <div style="font-size: ${baseSize * 0.85}px; color: ${textColor}; opacity: 0.8; font-style: italic;">
+                                      ${term.etymology}
+                                    </div>
+                                  </div>
+                                ` : ''}
+
+                                ${term.related && term.related.length > 0 ? `
+                                  <div>
+                                    <div style="font-size: ${baseSize * 0.85}px; color: ${primaryColor}; font-weight: 600; margin-bottom: 8px;">
+                                      🔗 Istilah Terkait
+                                    </div>
+                                    <div class="flex flex-wrap gap-2">
+                                      ${term.related.map(relatedTerm => `
+                                        <button 
+                                          onclick="handleSearch('${relatedTerm}')"
+                                          class="related-link px-3 py-1 rounded-lg"
+                                          style="background-color: ${bgColor}; color: ${secondaryColor}; font-size: ${baseSize * 0.85}px; border: 1px solid ${secondaryColor}33;">
+                                          ${relatedTerm} →
+                                        </button>
+                                      `).join('')}
+                                    </div>
+                                  </div>
+                                ` : ''}
+                              </div>
+                            ` : ''}
+
+                            <button 
+                              onclick="toggleExpand(${term.id})"
+                              class="mt-3 w-full py-2 rounded-lg transition-all"
+                              style="background-color: ${bgColor}; color: ${primaryColor}; font-size: ${baseSize * 0.9}px; font-weight: 600; border: 1px solid ${primaryColor}33;">
+                              ${isExpanded ? '▲ Tutup' : '▼ Baca Selengkapnya'}
+                            </button>
+                          </div>
+                        `;
+                      }).join('')}
+                    </div>
+                  </div>
+                `).join('')}
+              </main>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function onConfigChange(newConfig) {
+      config = { ...config, ...newConfig };
+      updateUI();
+    }
+
+    function updateUI() {
+      const app = document.getElementById('app');
+      if (app) {
+        app.innerHTML = createApp();
+      }
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [
+          {
+            get: () => config.background_color || defaultConfig.background_color,
+            set: (value) => {
+              config.background_color = value;
+              window.elementSdk.setConfig({ background_color: value });
+            }
+          },
+          {
+            get: () => config.surface_color || defaultConfig.surface_color,
+            set: (value) => {
+              config.surface_color = value;
+              window.elementSdk.setConfig({ surface_color: value });
+            }
+          },
+          {
+            get: () => config.text_color || defaultConfig.text_color,
+            set: (value) => {
+              config.text_color = value;
+              window.elementSdk.setConfig({ text_color: value });
+            }
+          },
+          {
+            get: () => config.primary_action || defaultConfig.primary_action,
+            set: (value) => {
+              config.primary_action = value;
+              window.elementSdk.setConfig({ primary_action: value });
+            }
+          },
+          {
+            get: () => config.secondary_action || defaultConfig.secondary_action,
+            set: (value) => {
+              config.secondary_action = value;
+              window.elementSdk.setConfig({ secondary_action: value });
+            }
+          }
+        ],
+        borderables: [],
+        fontEditable: {
+          get: () => config.font_family || defaultConfig.font_family,
+          set: (value) => {
+            config.font_family = value;
+            window.elementSdk.setConfig({ font_family: value });
+          }
+        },
+        fontSizeable: {
+          get: () => config.font_size || defaultConfig.font_size,
+          set: (value) => {
+            config.font_size = value;
+            window.elementSdk.setConfig({ font_size: value });
+          }
+        }
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ["page_title", config.page_title || defaultConfig.page_title],
+        ["page_subtitle", config.page_subtitle || defaultConfig.page_subtitle],
+        ["search_placeholder", config.search_placeholder || defaultConfig.search_placeholder],
+        ["clear_button", config.clear_button || defaultConfig.clear_button],
+        ["all_categories", config.all_categories || defaultConfig.all_categories],
+        ["chemistry_category", config.chemistry_category || defaultConfig.chemistry_category],
+        ["industry_category", config.industry_category || defaultConfig.industry_category],
+        ["environment_category", config.environment_category || defaultConfig.environment_category],
+        ["print_button", config.print_button || defaultConfig.print_button],
+        ["back_button", config.back_button || defaultConfig.back_button]
+      ]);
+    }
+
+    async function init() {
+      bookmarkedTerms = getBookmarkedTerms();
+      
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig,
+          onConfigChange,
+          mapToCapabilities,
+          mapToEditPanelValues
+        });
+        
+        config = window.elementSdk.config;
+      }
+      
+      updateUI();
+    }
+
+    window.handleSearch = handleSearch;
+    window.clearSearch = clearSearch;
+    window.setCategory = setCategory;
+    window.scrollToLetter = scrollToLetter;
+    window.toggleExpand = toggleExpand;
+    window.toggleBookmark = toggleBookmark;
+    window.printGlossary = printGlossary;
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a3edb6de3ad051a',t:'MTc2NDA0OTcwNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

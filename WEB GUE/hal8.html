@@ -1,0 +1,1039 @@
+<!doctype html>
+<html lang="id">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Layout Pembelajaran Minyak Bumi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    
+    * {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    html {
+      height: 100%;
+      scroll-behavior: smooth;
+    }
+    
+    body {
+      height: 100%;
+      margin: 0;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    
+    .sticky-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      transition: all 0.3s ease;
+    }
+    
+    .sticky-header.scrolled {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    
+    .nav-link {
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 50%;
+      width: 0;
+      height: 3px;
+      background: currentColor;
+      transition: all 0.3s ease;
+      transform: translateX(-50%);
+    }
+    
+    .nav-link:hover::after,
+    .nav-link.active::after {
+      width: 100%;
+    }
+    
+    .hamburger {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      cursor: pointer;
+    }
+    
+    .hamburger span {
+      display: block;
+      width: 24px;
+      height: 3px;
+      background: currentColor;
+      transition: all 0.3s ease;
+      border-radius: 2px;
+    }
+    
+    .hamburger.active span:nth-child(1) {
+      transform: rotate(45deg) translate(6px, 6px);
+    }
+    
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+    }
+    
+    .hamburger.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(6px, -6px);
+    }
+    
+    .mobile-menu {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease;
+    }
+    
+    .mobile-menu.open {
+      max-height: 500px;
+    }
+    
+    .back-to-top {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      z-index: 40;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .back-to-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .back-to-top:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .loading-indicator {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, currentColor, transparent);
+      z-index: 100;
+      animation: loading 1.5s ease-in-out infinite;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .loading-indicator.active {
+      opacity: 1;
+    }
+    
+    @keyframes loading {
+      0% {
+        transform: translateX(-100%);
+      }
+      100% {
+        transform: translateX(100%);
+      }
+    }
+    
+    .progress-tracker {
+      position: relative;
+    }
+    
+    .progress-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .progress-item:hover {
+      transform: translateX(4px);
+    }
+    
+    .progress-item.visited {
+      opacity: 1;
+    }
+    
+    .progress-item.not-visited {
+      opacity: 0.5;
+    }
+    
+    .progress-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      transition: all 0.3s ease;
+    }
+    
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .breadcrumb-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .social-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .social-icon:hover {
+      transform: translateY(-3px);
+    }
+    
+    .font-size-btn {
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+    }
+    
+    .font-size-btn:hover {
+      transform: scale(1.1);
+    }
+    
+    .font-size-btn.active {
+      box-shadow: 0 0 0 2px currentColor;
+    }
+    
+    .page-transition {
+      animation: pageTransition 0.5s ease;
+    }
+    
+    @keyframes pageTransition {
+      from {
+        opacity: 0;
+        transform: translateX(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    /* Dark mode transitions */
+    * {
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+    
+    .theme-toggle {
+      position: relative;
+      width: 60px;
+      height: 32px;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .theme-toggle-slider {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: white;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .theme-toggle.dark .theme-toggle-slider {
+      left: 32px;
+    }
+    
+    @media (max-width: 768px) {
+      .back-to-top {
+        bottom: 16px;
+        right: 16px;
+        width: 40px;
+        height: 40px;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="min-h-full"><!-- Loading Indicator -->
+  <div id="loading-indicator" class="loading-indicator"></div><!-- Back to Top Button -->
+  <div id="back-to-top" class="back-to-top">
+   <svg width="24" height="24" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7" />
+   </svg>
+  </div>
+  <div id="app" class="w-full min-h-full flex flex-col"></div>
+  <script>
+    const defaultConfig = {
+      site_title: "Pembelajaran Minyak Bumi",
+      site_subtitle: "Kimia SMA Kelas XI",
+      nav_home: "Beranda",
+      nav_material: "Materi",
+      nav_simulation: "Simulasi",
+      nav_facts: "Fun Facts",
+      nav_quiz: "Kuis",
+      nav_glossary: "Glosarium",
+      nav_summary: "Ringkasan",
+      copyright_text: "© 2025 Website Pembelajaran Kimia",
+      developed_by: "Universitas Negeri Malang",
+      footer_about: "Tentang",
+      footer_contact: "Kontak",
+      footer_feedback: "Feedback",
+      background_color: "#f9fafb",
+      surface_color: "#ffffff",
+      text_color: "#1f2937",
+      primary_action: "#1e40af",
+      secondary_action: "#10b981",
+      font_family: "Inter",
+      font_size: 16
+    };
+
+    let config = { ...defaultConfig };
+    let currentPage = 'home';
+    let mobileMenuOpen = false;
+    let isDarkMode = false;
+    let fontSize = 'medium';
+    let visitedPages = new Set(['home']);
+
+    const pages = [
+      { id: 'home', name: 'Beranda', icon: '🏠', configKey: 'nav_home' },
+      { id: 'material', name: 'Materi', icon: '📚', configKey: 'nav_material' },
+      { id: 'simulation', name: 'Simulasi', icon: '🧪', configKey: 'nav_simulation' },
+      { id: 'facts', name: 'Fun Facts', icon: '💡', configKey: 'nav_facts' },
+      { id: 'quiz', name: 'Kuis', icon: '📝', configKey: 'nav_quiz' },
+      { id: 'glossary', name: 'Glosarium', icon: '📖', configKey: 'nav_glossary' },
+      { id: 'summary', name: 'Ringkasan', icon: '📋', configKey: 'nav_summary' }
+    ];
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem('learning_app_state');
+        if (saved) {
+          const state = JSON.parse(saved);
+          visitedPages = new Set(state.visitedPages || ['home']);
+          isDarkMode = state.isDarkMode || false;
+          fontSize = state.fontSize || 'medium';
+        }
+      } catch (e) {
+        console.error('Failed to load state');
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem('learning_app_state', JSON.stringify({
+          visitedPages: [...visitedPages],
+          isDarkMode,
+          fontSize
+        }));
+      } catch (e) {
+        console.error('Failed to save state');
+      }
+    }
+
+    function navigateToPage(pageId) {
+      if (pageId === currentPage) return;
+      
+      showLoading();
+      currentPage = pageId;
+      visitedPages.add(pageId);
+      mobileMenuOpen = false;
+      saveState();
+      
+      setTimeout(() => {
+        hideLoading();
+        updateUI();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 300);
+    }
+
+    function toggleMobileMenu() {
+      mobileMenuOpen = !mobileMenuOpen;
+      updateUI();
+    }
+
+    function toggleDarkMode() {
+      isDarkMode = !isDarkMode;
+      saveState();
+      updateUI();
+    }
+
+    function changeFontSize(size) {
+      fontSize = size;
+      saveState();
+      updateUI();
+    }
+
+    function showLoading() {
+      const indicator = document.getElementById('loading-indicator');
+      if (indicator) {
+        indicator.classList.add('active');
+      }
+    }
+
+    function hideLoading() {
+      const indicator = document.getElementById('loading-indicator');
+      if (indicator) {
+        indicator.classList.remove('active');
+      }
+    }
+
+    function getBreadcrumb() {
+      const current = pages.find(p => p.id === currentPage);
+      return [
+        { name: config.nav_home || defaultConfig.nav_home, id: 'home' },
+        ...(currentPage !== 'home' ? [{ name: current?.name || '', id: currentPage }] : [])
+      ];
+    }
+
+    function createHeader() {
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const bgColor = isDarkMode ? '#1f2937' : (config.surface_color || defaultConfig.surface_color);
+      const textColor = isDarkMode ? '#f9fafb' : (config.text_color || defaultConfig.text_color);
+      const primaryColor = config.primary_action || defaultConfig.primary_action;
+      const secondaryColor = config.secondary_action || defaultConfig.secondary_action;
+      
+      const fontMultiplier = fontSize === 'small' ? 0.875 : fontSize === 'large' ? 1.125 : 1;
+      
+      return `
+        <header class="sticky-header w-full" style="background-color: ${bgColor}; color: ${textColor}; font-family: '${customFont}', sans-serif;">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between py-4">
+              <!-- Logo & Title -->
+              <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateToPage('home')">
+                <div class="w-12 h-12 rounded-xl flex items-center justify-center" 
+                     style="background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%);">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                    <circle cx="10" cy="8" r="2" fill="white"/>
+                    <path d="M14 12c0-1.1.9-2 2-2s2 .9 2 2"/>
+                  </svg>
+                </div>
+                <div>
+                  <div style="font-size: ${baseSize * 1.25 * fontMultiplier}px; font-weight: 700; color: ${textColor};">
+                    ${config.site_title || defaultConfig.site_title}
+                  </div>
+                  <div style="font-size: ${baseSize * 0.75 * fontMultiplier}px; color: ${textColor}; opacity: 0.7;">
+                    ${config.site_subtitle || defaultConfig.site_subtitle}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Desktop Navigation -->
+              <nav class="hidden lg:flex items-center space-x-6">
+                ${pages.map(page => `
+                  <a class="nav-link ${currentPage === page.id ? 'active' : ''}" 
+                     onclick="navigateToPage('${page.id}')"
+                     style="font-size: ${baseSize * 0.9 * fontMultiplier}px; font-weight: 600; color: ${currentPage === page.id ? primaryColor : textColor}; cursor: pointer;">
+                    ${page.icon} ${config[page.configKey] || page.name}
+                  </a>
+                `).join('')}
+              </nav>
+
+              <!-- Desktop Controls -->
+              <div class="hidden lg:flex items-center space-x-4">
+                <!-- Font Size -->
+                <div class="flex items-center space-x-1 px-3 py-1 rounded-lg" style="background-color: ${isDarkMode ? '#374151' : '#f3f4f6'};">
+                  <button class="font-size-btn ${fontSize === 'small' ? 'active' : ''}" 
+                          onclick="changeFontSize('small')"
+                          style="font-size: ${baseSize * 0.75}px; color: ${textColor};">
+                    A-
+                  </button>
+                  <button class="font-size-btn ${fontSize === 'medium' ? 'active' : ''}" 
+                          onclick="changeFontSize('medium')"
+                          style="font-size: ${baseSize * 0.9}px; color: ${textColor};">
+                    A
+                  </button>
+                  <button class="font-size-btn ${fontSize === 'large' ? 'active' : ''}" 
+                          onclick="changeFontSize('large')"
+                          style="font-size: ${baseSize * 1.05}px; color: ${textColor};">
+                    A+
+                  </button>
+                </div>
+
+                <!-- Dark Mode Toggle -->
+                <div class="theme-toggle ${isDarkMode ? 'dark' : ''}" 
+                     onclick="toggleDarkMode()"
+                     style="background-color: ${isDarkMode ? primaryColor : '#e5e7eb'};">
+                  <div class="theme-toggle-slider">
+                    ${isDarkMode ? '🌙' : '☀️'}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Mobile Hamburger -->
+              <button class="hamburger lg:hidden ${mobileMenuOpen ? 'active' : ''}" 
+                      onclick="toggleMobileMenu()"
+                      style="color: ${textColor};">
+                <span></span>
+                <span></span>
+                <span></span>
+              </button>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div class="mobile-menu lg:hidden ${mobileMenuOpen ? 'open' : ''}" 
+                 style="background-color: ${bgColor};">
+              <div class="py-4 space-y-2">
+                ${pages.map(page => `
+                  <a class="block px-4 py-3 rounded-lg ${currentPage === page.id ? 'active' : ''}" 
+                     onclick="navigateToPage('${page.id}')"
+                     style="font-size: ${baseSize * 0.9 * fontMultiplier}px; font-weight: 600; color: ${currentPage === page.id ? primaryColor : textColor}; background-color: ${currentPage === page.id ? primaryColor + '15' : 'transparent'}; cursor: pointer;">
+                    ${page.icon} ${config[page.configKey] || page.name}
+                  </a>
+                `).join('')}
+                
+                <div class="px-4 py-3 space-y-3">
+                  <!-- Mobile Font Size -->
+                  <div>
+                    <div style="font-size: ${baseSize * 0.75 * fontMultiplier}px; color: ${textColor}; opacity: 0.7; margin-bottom: 8px;">
+                      Ukuran Font
+                    </div>
+                    <div class="flex items-center space-x-2">
+                      <button class="font-size-btn ${fontSize === 'small' ? 'active' : ''}" 
+                              onclick="changeFontSize('small')"
+                              style="font-size: ${baseSize * 0.75}px; color: ${textColor}; background-color: ${isDarkMode ? '#374151' : '#f3f4f6'};">
+                        A-
+                      </button>
+                      <button class="font-size-btn ${fontSize === 'medium' ? 'active' : ''}" 
+                              onclick="changeFontSize('medium')"
+                              style="font-size: ${baseSize * 0.9}px; color: ${textColor}; background-color: ${isDarkMode ? '#374151' : '#f3f4f6'};">
+                        A
+                      </button>
+                      <button class="font-size-btn ${fontSize === 'large' ? 'active' : ''}" 
+                              onclick="changeFontSize('large')"
+                              style="font-size: ${baseSize * 1.05}px; color: ${textColor}; background-color: ${isDarkMode ? '#374151' : '#f3f4f6'};">
+                        A+
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Mobile Dark Mode -->
+                  <div>
+                    <div style="font-size: ${baseSize * 0.75 * fontMultiplier}px; color: ${textColor}; opacity: 0.7; margin-bottom: 8px;">
+                      Tema
+                    </div>
+                    <div class="theme-toggle ${isDarkMode ? 'dark' : ''}" 
+                         onclick="toggleDarkMode()"
+                         style="background-color: ${isDarkMode ? primaryColor : '#e5e7eb'};">
+                      <div class="theme-toggle-slider">
+                        ${isDarkMode ? '🌙' : '☀️'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+      `;
+    }
+
+    function createSidebar() {
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const bgColor = isDarkMode ? '#1f2937' : (config.surface_color || defaultConfig.surface_color);
+      const textColor = isDarkMode ? '#f9fafb' : (config.text_color || defaultConfig.text_color);
+      const primaryColor = config.primary_action || defaultConfig.primary_action;
+      const secondaryColor = config.secondary_action || defaultConfig.secondary_action;
+      
+      const fontMultiplier = fontSize === 'small' ? 0.875 : fontSize === 'large' ? 1.125 : 1;
+      const visitedCount = visitedPages.size;
+      const totalPages = pages.length;
+      const progressPercent = Math.round((visitedCount / totalPages) * 100);
+      
+      return `
+        <aside class="hidden xl:block w-72 flex-shrink-0">
+          <div class="sticky top-24 rounded-2xl p-6 space-y-6" 
+               style="background-color: ${bgColor}; border: 2px solid ${isDarkMode ? '#374151' : '#e5e7eb'};">
+            
+            <!-- Progress Section -->
+            <div>
+              <h3 style="font-size: ${baseSize * 1.1 * fontMultiplier}px; font-weight: 700; color: ${textColor}; margin-bottom: 12px;">
+                📊 Progress Pembelajaran
+              </h3>
+              <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                  <span style="font-size: ${baseSize * 0.85 * fontMultiplier}px; color: ${textColor}; opacity: 0.8;">
+                    ${visitedCount} dari ${totalPages} halaman
+                  </span>
+                  <span style="font-size: ${baseSize * 0.9 * fontMultiplier}px; font-weight: 700; color: ${primaryColor};">
+                    ${progressPercent}%
+                  </span>
+                </div>
+                <div class="w-full h-2 rounded-full" style="background-color: ${isDarkMode ? '#374151' : '#e5e7eb'};">
+                  <div class="h-full rounded-full transition-all duration-500" 
+                       style="width: ${progressPercent}%; background: linear-gradient(90deg, ${primaryColor} 0%, ${secondaryColor} 100%);"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Progress Tracker -->
+            <div class="progress-tracker">
+              <h3 style="font-size: ${baseSize * 1.1 * fontMultiplier}px; font-weight: 700; color: ${textColor}; margin-bottom: 12px;">
+                🗺️ Navigasi Cepat
+              </h3>
+              <div class="space-y-1">
+                ${pages.map(page => {
+                  const isVisited = visitedPages.has(page.id);
+                  const isActive = currentPage === page.id;
+                  return `
+                    <div class="progress-item ${isVisited ? 'visited' : 'not-visited'} ${isActive ? 'active' : ''}" 
+                         onclick="navigateToPage('${page.id}')"
+                         style="background-color: ${isActive ? primaryColor + '15' : 'transparent'};">
+                      <div class="progress-dot" 
+                           style="background-color: ${isVisited ? (isActive ? primaryColor : secondaryColor) : (isDarkMode ? '#4b5563' : '#d1d5db')};"></div>
+                      <span style="font-size: ${baseSize * 0.85 * fontMultiplier}px; font-weight: ${isActive ? '600' : '400'}; color: ${isActive ? primaryColor : textColor};">
+                        ${page.icon} ${config[page.configKey] || page.name}
+                      </span>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="p-4 rounded-xl" style="background: linear-gradient(135deg, ${primaryColor}15 0%, ${secondaryColor}15 100%);">
+              <div style="font-size: ${baseSize * 0.85 * fontMultiplier}px; font-weight: 600; color: ${textColor}; margin-bottom: 8px;">
+                💪 Tetap Semangat!
+              </div>
+              <div style="font-size: ${baseSize * 0.75 * fontMultiplier}px; color: ${textColor}; opacity: 0.8; line-height: 1.5;">
+                Anda telah mengeksplorasi ${visitedCount} dari ${totalPages} halaman pembelajaran.
+              </div>
+            </div>
+          </div>
+        </aside>
+      `;
+    }
+
+    function createBreadcrumb() {
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const textColor = isDarkMode ? '#f9fafb' : (config.text_color || defaultConfig.text_color);
+      const primaryColor = config.primary_action || defaultConfig.primary_action;
+      
+      const fontMultiplier = fontSize === 'small' ? 0.875 : fontSize === 'large' ? 1.125 : 1;
+      const breadcrumb = getBreadcrumb();
+      
+      return `
+        <div class="breadcrumb mb-6">
+          ${breadcrumb.map((item, index) => `
+            <div class="breadcrumb-item">
+              <span onclick="navigateToPage('${item.id}')" 
+                    style="font-size: ${baseSize * 0.85 * fontMultiplier}px; color: ${index === breadcrumb.length - 1 ? primaryColor : textColor}; opacity: ${index === breadcrumb.length - 1 ? '1' : '0.6'}; cursor: pointer; font-weight: ${index === breadcrumb.length - 1 ? '600' : '400'};">
+                ${item.name}
+              </span>
+              ${index < breadcrumb.length - 1 ? `<span style="color: ${textColor}; opacity: 0.4;">/</span>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function createPageContent() {
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const bgColor = isDarkMode ? '#1f2937' : (config.surface_color || defaultConfig.surface_color);
+      const textColor = isDarkMode ? '#f9fafb' : (config.text_color || defaultConfig.text_color);
+      const primaryColor = config.primary_action || defaultConfig.primary_action;
+      const secondaryColor = config.secondary_action || defaultConfig.secondary_action;
+      
+      const fontMultiplier = fontSize === 'small' ? 0.875 : fontSize === 'large' ? 1.125 : 1;
+      const currentPageData = pages.find(p => p.id === currentPage);
+      
+      return `
+        <div class="page-transition">
+          ${createBreadcrumb()}
+          
+          <div class="rounded-2xl p-8 mb-6" 
+               style="background: linear-gradient(135deg, ${primaryColor}15 0%, ${secondaryColor}15 100%); border: 2px solid ${isDarkMode ? '#374151' : '#e5e7eb'};">
+            <div style="font-size: ${baseSize * 3 * fontMultiplier}px; margin-bottom: 16px;">
+              ${currentPageData?.icon || '📚'}
+            </div>
+            <h1 style="font-size: ${baseSize * 2.5 * fontMultiplier}px; font-weight: 800; color: ${textColor}; margin-bottom: 12px;">
+              ${config[currentPageData?.configKey] || currentPageData?.name || 'Halaman'}
+            </h1>
+            <p style="font-size: ${baseSize * 1.1 * fontMultiplier}px; color: ${textColor}; opacity: 0.8; line-height: 1.7;">
+              Selamat datang di halaman ${config[currentPageData?.configKey] || currentPageData?.name}. Konten pembelajaran akan ditampilkan di sini.
+            </p>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-6 mb-6">
+            ${[
+              { title: 'Interaktif', icon: '🎮', desc: 'Pembelajaran dengan simulasi dan animasi menarik' },
+              { title: 'Komprehensif', icon: '📖', desc: 'Materi lengkap dari dasar hingga mahir' },
+              { title: 'Fun Facts', icon: '💡', desc: 'Fakta menarik seputar minyak bumi' },
+              { title: 'Evaluasi', icon: '✅', desc: 'Kuis untuk mengukur pemahaman Anda' }
+            ].map(card => `
+              <div class="rounded-xl p-6 transition-all hover:scale-105" 
+                   style="background-color: ${bgColor}; border: 2px solid ${isDarkMode ? '#374151' : '#e5e7eb'};">
+                <div style="font-size: ${baseSize * 2 * fontMultiplier}px; margin-bottom: 12px;">
+                  ${card.icon}
+                </div>
+                <h3 style="font-size: ${baseSize * 1.2 * fontMultiplier}px; font-weight: 700; color: ${textColor}; margin-bottom: 8px;">
+                  ${card.title}
+                </h3>
+                <p style="font-size: ${baseSize * 0.9 * fontMultiplier}px; color: ${textColor}; opacity: 0.8; line-height: 1.6;">
+                  ${card.desc}
+                </p>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="rounded-2xl p-8" 
+               style="background-color: ${bgColor}; border: 2px solid ${isDarkMode ? '#374151' : '#e5e7eb'};">
+            <h2 style="font-size: ${baseSize * 1.8 * fontMultiplier}px; font-weight: 700; color: ${textColor}; margin-bottom: 16px;">
+              📌 Tentang Halaman Ini
+            </h2>
+            <p style="font-size: ${baseSize * fontMultiplier}px; color: ${textColor}; opacity: 0.8; line-height: 1.8; margin-bottom: 16px;">
+              Ini adalah demo layout navigasi yang konsisten untuk aplikasi pembelajaran Minyak Bumi. Halaman ini menampilkan berbagai komponen seperti header sticky, navigasi responsif, sidebar progress tracker, breadcrumb, dark mode toggle, dan font size adjuster.
+            </p>
+            <p style="font-size: ${baseSize * fontMultiplier}px; color: ${textColor}; opacity: 0.8; line-height: 1.8;">
+              Navigasi antar halaman akan tersimpan di progress tracker. Cobalah fitur dark mode dan pengaturan ukuran font di header!
+            </p>
+          </div>
+        </div>
+      `;
+    }
+
+    function createFooter() {
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const bgColor = isDarkMode ? '#1f2937' : (config.surface_color || defaultConfig.surface_color);
+      const textColor = isDarkMode ? '#f9fafb' : (config.text_color || defaultConfig.text_color);
+      const primaryColor = config.primary_action || defaultConfig.primary_action;
+      const secondaryColor = config.secondary_action || defaultConfig.secondary_action;
+      
+      const fontMultiplier = fontSize === 'small' ? 0.875 : fontSize === 'large' ? 1.125 : 1;
+      
+      return `
+        <footer class="w-full mt-auto" style="background-color: ${bgColor}; color: ${textColor}; font-family: '${customFont}', sans-serif; border-top: 2px solid ${isDarkMode ? '#374151' : '#e5e7eb'};">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid md:grid-cols-3 gap-8 mb-8">
+              <!-- About -->
+              <div>
+                <div class="flex items-center space-x-3 mb-4">
+                  <div class="w-10 h-10 rounded-lg flex items-center justify-center" 
+                       style="background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                    </svg>
+                  </div>
+                  <div style="font-size: ${baseSize * 1.1 * fontMultiplier}px; font-weight: 700;">
+                    ${config.site_title || defaultConfig.site_title}
+                  </div>
+                </div>
+                <p style="font-size: ${baseSize * 0.85 * fontMultiplier}px; color: ${textColor}; opacity: 0.8; line-height: 1.7;">
+                  Platform pembelajaran interaktif untuk memahami minyak bumi secara komprehensif dan menyenangkan.
+                </p>
+              </div>
+
+              <!-- Quick Links -->
+              <div>
+                <h4 style="font-size: ${baseSize * fontMultiplier}px; font-weight: 700; color: ${textColor}; margin-bottom: 16px;">
+                  Tautan Cepat
+                </h4>
+                <div class="space-y-2">
+                  ${[
+                    { label: config.footer_about || defaultConfig.footer_about, href: '#' },
+                    { label: config.footer_contact || defaultConfig.footer_contact, href: '#' },
+                    { label: config.footer_feedback || defaultConfig.footer_feedback, href: '#' }
+                  ].map(link => `
+                    <a href="${link.href}" 
+                       class="block transition-all hover:translate-x-1"
+                       style="font-size: ${baseSize * 0.85 * fontMultiplier}px; color: ${textColor}; opacity: 0.8;">
+                      → ${link.label}
+                    </a>
+                  `).join('')}
+                </div>
+              </div>
+
+              <!-- Social Media -->
+              <div>
+                <h4 style="font-size: ${baseSize * fontMultiplier}px; font-weight: 700; color: ${textColor}; margin-bottom: 16px;">
+                  Ikuti Kami
+                </h4>
+                <div class="flex space-x-3">
+                  ${[
+                    { icon: 'M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z', label: 'Facebook', color: '#1877f2' },
+                    { icon: 'M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z', label: 'Twitter', color: '#1da1f2' },
+                    { icon: 'M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z M2 9h4v12H2z M4 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4z', label: 'LinkedIn', color: '#0a66c2' }
+                  ].map(social => `
+                    <div class="social-icon" 
+                         style="background-color: ${social.color}15; color: ${social.color};"
+                         title="${social.label}">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="${social.icon}"/>
+                      </svg>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+
+            <!-- Bottom -->
+            <div class="pt-8" style="border-top: 1px solid ${isDarkMode ? '#374151' : '#e5e7eb'};">
+              <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                <div style="font-size: ${baseSize * 0.85 * fontMultiplier}px; color: ${textColor}; opacity: 0.7;">
+                  ${config.copyright_text || defaultConfig.copyright_text}
+                </div>
+                <div style="font-size: ${baseSize * 0.85 * fontMultiplier}px; color: ${textColor}; opacity: 0.7;">
+                  Developed by <span style="font-weight: 600; color: ${primaryColor};">${config.developed_by || defaultConfig.developed_by}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </footer>
+      `;
+    }
+
+    function createApp() {
+      const bgColor = isDarkMode ? '#111827' : (config.background_color || defaultConfig.background_color);
+      
+      return `
+        <div class="w-full min-h-full flex flex-col" style="background-color: ${bgColor};">
+          ${createHeader()}
+          
+          <div class="flex-1 w-full">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+              <div class="flex gap-8">
+                ${createSidebar()}
+                
+                <main class="flex-1 min-w-0">
+                  ${createPageContent()}
+                </main>
+              </div>
+            </div>
+          </div>
+          
+          ${createFooter()}
+        </div>
+      `;
+    }
+
+    async function onConfigChange(newConfig) {
+      config = { ...config, ...newConfig };
+      updateUI();
+    }
+
+    function updateUI() {
+      const app = document.getElementById('app');
+      if (app) {
+        app.innerHTML = createApp();
+      }
+      
+      updateLoadingIndicator();
+      updateBackToTop();
+      updateHeaderScroll();
+    }
+
+    function updateLoadingIndicator() {
+      const indicator = document.getElementById('loading-indicator');
+      if (indicator) {
+        const primaryColor = config.primary_action || defaultConfig.primary_action;
+        indicator.style.color = primaryColor;
+      }
+    }
+
+    function updateBackToTop() {
+      const btn = document.getElementById('back-to-top');
+      if (btn) {
+        const primaryColor = config.primary_action || defaultConfig.primary_action;
+        const textColor = isDarkMode ? '#f9fafb' : '#ffffff';
+        btn.style.backgroundColor = primaryColor;
+        btn.style.color = textColor;
+      }
+    }
+
+    function updateHeaderScroll() {
+      const header = document.querySelector('.sticky-header');
+      if (!header) return;
+      
+      const handleScroll = () => {
+        if (window.scrollY > 10) {
+          header.classList.add('scrolled');
+        } else {
+          header.classList.remove('scrolled');
+        }
+        
+        const backToTop = document.getElementById('back-to-top');
+        if (backToTop) {
+          if (window.scrollY > 300) {
+            backToTop.classList.add('visible');
+          } else {
+            backToTop.classList.remove('visible');
+          }
+        }
+      };
+      
+      window.removeEventListener('scroll', handleScroll);
+      window.addEventListener('scroll', handleScroll);
+    }
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [
+          {
+            get: () => config.background_color || defaultConfig.background_color,
+            set: (value) => {
+              config.background_color = value;
+              window.elementSdk.setConfig({ background_color: value });
+            }
+          },
+          {
+            get: () => config.surface_color || defaultConfig.surface_color,
+            set: (value) => {
+              config.surface_color = value;
+              window.elementSdk.setConfig({ surface_color: value });
+            }
+          },
+          {
+            get: () => config.text_color || defaultConfig.text_color,
+            set: (value) => {
+              config.text_color = value;
+              window.elementSdk.setConfig({ text_color: value });
+            }
+          },
+          {
+            get: () => config.primary_action || defaultConfig.primary_action,
+            set: (value) => {
+              config.primary_action = value;
+              window.elementSdk.setConfig({ primary_action: value });
+            }
+          },
+          {
+            get: () => config.secondary_action || defaultConfig.secondary_action,
+            set: (value) => {
+              config.secondary_action = value;
+              window.elementSdk.setConfig({ secondary_action: value });
+            }
+          }
+        ],
+        borderables: [],
+        fontEditable: {
+          get: () => config.font_family || defaultConfig.font_family,
+          set: (value) => {
+            config.font_family = value;
+            window.elementSdk.setConfig({ font_family: value });
+          }
+        },
+        fontSizeable: {
+          get: () => config.font_size || defaultConfig.font_size,
+          set: (value) => {
+            config.font_size = value;
+            window.elementSdk.setConfig({ font_size: value });
+          }
+        }
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ["site_title", config.site_title || defaultConfig.site_title],
+        ["site_subtitle", config.site_subtitle || defaultConfig.site_subtitle],
+        ["nav_home", config.nav_home || defaultConfig.nav_home],
+        ["nav_material", config.nav_material || defaultConfig.nav_material],
+        ["nav_simulation", config.nav_simulation || defaultConfig.nav_simulation],
+        ["nav_facts", config.nav_facts || defaultConfig.nav_facts],
+        ["nav_quiz", config.nav_quiz || defaultConfig.nav_quiz],
+        ["nav_glossary", config.nav_glossary || defaultConfig.nav_glossary],
+        ["nav_summary", config.nav_summary || defaultConfig.nav_summary],
+        ["copyright_text", config.copyright_text || defaultConfig.copyright_text],
+        ["developed_by", config.developed_by || defaultConfig.developed_by],
+        ["footer_about", config.footer_about || defaultConfig.footer_about],
+        ["footer_contact", config.footer_contact || defaultConfig.footer_contact],
+        ["footer_feedback", config.footer_feedback || defaultConfig.footer_feedback]
+      ]);
+    }
+
+    async function init() {
+      loadState();
+      
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig,
+          onConfigChange,
+          mapToCapabilities,
+          mapToEditPanelValues
+        });
+        
+        config = window.elementSdk.config;
+      }
+      
+      updateUI();
+      
+      document.getElementById('back-to-top')?.addEventListener('click', scrollToTop);
+    }
+
+    window.navigateToPage = navigateToPage;
+    window.toggleMobileMenu = toggleMobileMenu;
+    window.toggleDarkMode = toggleDarkMode;
+    window.changeFontSize = changeFontSize;
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a3ee3641011051a',t:'MTc2NDA1MDAzMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

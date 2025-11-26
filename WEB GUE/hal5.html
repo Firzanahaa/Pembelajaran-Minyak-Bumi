@@ -1,0 +1,1051 @@
+<!doctype html>
+<html lang="id">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kuis Interaktif Minyak Bumi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+    
+    * {
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .custom-radio {
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border: 3px solid;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      flex-shrink: 0;
+    }
+    
+    .custom-radio:checked::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    
+    .answer-option {
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+    }
+    
+    .answer-option:hover {
+      transform: translateX(8px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    .answer-option.correct {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+      border-color: #10b981 !important;
+      animation: correctPulse 0.5s ease;
+    }
+    
+    .answer-option.incorrect {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+      border-color: #ef4444 !important;
+      animation: incorrectShake 0.5s ease;
+    }
+    
+    @keyframes correctPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+    
+    @keyframes incorrectShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-10px); }
+      75% { transform: translateX(10px); }
+    }
+    
+    .progress-bar {
+      transition: width 0.5s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .progress-bar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      animation: shimmer 2s infinite;
+    }
+    
+    @keyframes shimmer {
+      to { left: 100%; }
+    }
+    
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background: #fbbf24;
+      position: absolute;
+      animation: confetti-fall 3s linear forwards;
+    }
+    
+    @keyframes confetti-fall {
+      to {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .score-circle {
+      animation: scaleIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    
+    @keyframes scaleIn {
+      from {
+        transform: scale(0);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+    
+    .timer {
+      animation: timerPulse 1s infinite;
+    }
+    
+    @keyframes timerPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    
+    input:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.3);
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="min-h-full">
+  <div id="app" class="w-full min-h-full"></div>
+  <script>
+    const defaultConfig = {
+      welcome_title: "Kuis Interaktif Minyak Bumi",
+      welcome_subtitle: "Uji pemahamanmu tentang minyak bumi dan produk turunannya",
+      name_label: "Nama Lengkap",
+      class_label: "Kelas (opsional)",
+      start_button: "🚀 Mulai Kuis",
+      quiz_info: "10 soal pilihan ganda • Waktu 15 menit",
+      prev_button: "← Sebelumnya",
+      next_button: "Selanjutnya →",
+      submit_button: "✓ Submit Kuis",
+      result_title: "Hasil Kuis",
+      download_button: "📥 Unduh Hasil",
+      retry_button: "🔄 Ulangi Kuis",
+      home_button: "🏠 Kembali ke Beranda",
+      background_color: "#0f172a",
+      surface_color: "#1e293b",
+      text_color: "#f1f5f9",
+      primary_action: "#fbbf24",
+      secondary_action: "#14b8a6",
+      font_family: "Poppins",
+      font_size: 16
+    };
+
+    let config = { ...defaultConfig };
+    let currentPage = 'welcome';
+    let studentName = '';
+    let studentClass = '';
+    let currentQuestion = 0;
+    let answers = {};
+    let startTime = null;
+    let timeRemaining = 900;
+    let timerInterval = null;
+    let score = 0;
+
+    const questions = [
+      {
+        id: 1,
+        question: "Minyak bumi terbentuk dari organisme apa yang mati jutaan tahun lalu?",
+        options: [
+          "Tumbuhan darat seperti pohon dan rumput",
+          "Organisme laut mikroskopis seperti plankton dan alga",
+          "Batuan vulkanik yang meleleh",
+          "Mineral yang terkompresi"
+        ],
+        correct: 1,
+        explanation: "Minyak bumi terbentuk dari sisa-sisa organisme laut mikroskopis (plankton, alga, zooplankton) yang mati dan tertimbun selama 10-600 juta tahun yang lalu melalui proses diagenesis dan katagenesis."
+      },
+      {
+        id: 2,
+        question: "Proses pemisahan minyak mentah berdasarkan perbedaan titik didih disebut?",
+        options: [
+          "Filtrasi - menyaring partikel padat",
+          "Destilasi bertingkat - memanfaatkan perbedaan titik didih",
+          "Kristalisasi - pembentukan kristal",
+          "Ekstraksi - melarutkan dengan pelarut"
+        ],
+        correct: 1,
+        explanation: "Destilasi bertingkat adalah proses pemisahan komponen minyak mentah berdasarkan perbedaan titik didih di dalam menara destilasi. Komponen dengan titik didih rendah (seperti gas) naik ke atas, sementara yang berat (seperti aspal) mengendap di bawah."
+      },
+      {
+        id: 3,
+        question: "Fraksi minyak bumi yang digunakan sebagai bahan bakar pesawat jet adalah?",
+        options: [
+          "Bensin (C5-C12) - untuk kendaraan bermotor",
+          "Kerosin/Avtur (C12-C16) - untuk pesawat jet",
+          "Solar (C15-C18) - untuk mesin diesel",
+          "Aspal (>C30) - untuk jalan raya"
+        ],
+        correct: 1,
+        explanation: "Kerosin atau Aviation Turbine (Avtur) dengan rantai karbon C12-C16 digunakan sebagai bahan bakar pesawat jet karena memiliki titik didih dan energi yang sesuai untuk mesin turbine pesawat."
+      },
+      {
+        id: 4,
+        question: "Jumlah atom karbon dalam fraksi bensin (gasoline) adalah?",
+        options: [
+          "C1-C4 (Gas Petroleum/LPG)",
+          "C5-C12 (Bensin/Gasoline)",
+          "C15-C18 (Solar/Diesel)",
+          ">C30 (Residu/Aspal)"
+        ],
+        correct: 1,
+        explanation: "Bensin memiliki rantai karbon C5-C12 dengan titik didih 30-200°C. Inilah yang membuat bensin mudah menguap dan cocok untuk mesin pembakaran internal kendaraan bermotor."
+      },
+      {
+        id: 5,
+        question: "Apa dampak negatif utama penggunaan minyak bumi terhadap lingkungan?",
+        options: [
+          "Meningkatkan kualitas udara dan mengurangi polusi",
+          "Mengurangi suhu global dan mencegah pemanasan",
+          "Emisi gas rumah kaca (CO₂) yang menyebabkan perubahan iklim",
+          "Menyuburkan tanah dan meningkatkan pertanian"
+        ],
+        correct: 2,
+        explanation: "Pembakaran bahan bakar fosil menghasilkan emisi CO₂ dan gas rumah kaca lainnya yang menyumbang ~75% emisi global. Ini menyebabkan pemanasan global dan perubahan iklim."
+      },
+      {
+        id: 6,
+        question: "Satu barel minyak setara dengan berapa liter?",
+        options: [
+          "100 liter",
+          "125 liter",
+          "159 liter",
+          "200 liter"
+        ],
+        correct: 2,
+        explanation: "Satu barel minyak setara dengan 159 liter atau 42 gallon. Standar ini ditetapkan pada tahun 1866 dan masih digunakan hingga sekarang di seluruh dunia sebagai satuan perdagangan minyak."
+      },
+      {
+        id: 7,
+        question: "Negara mana yang memiliki cadangan minyak terbukti terbesar di dunia?",
+        options: [
+          "Arab Saudi (~17% cadangan global)",
+          "Amerika Serikat (~3% cadangan global)",
+          "Venezuela (~18% cadangan global)",
+          "Rusia (~6% cadangan global)"
+        ],
+        correct: 2,
+        explanation: "Venezuela memiliki cadangan minyak terbukti terbesar di dunia dengan 303.8 miliar barel (~18% cadangan global), disusul Arab Saudi dengan ~17% cadangan global."
+      },
+      {
+        id: 8,
+        question: "Berapa lama waktu yang dibutuhkan untuk pembentukan minyak bumi?",
+        options: [
+          "1.000 - 10.000 tahun",
+          "100.000 - 1 juta tahun",
+          "10 - 600 juta tahun",
+          "1 - 5 miliar tahun"
+        ],
+        correct: 2,
+        explanation: "Proses pembentukan minyak bumi membutuhkan waktu 10-600 juta tahun melalui proses diagenesis (perubahan fisik dan kimia) dan katagenesis (pemanasan dan tekanan tinggi). Karena itu minyak bumi termasuk sumber energi TIDAK TERBARUKAN."
+      },
+      {
+        id: 9,
+        question: "Produk apa saja yang TIDAK berasal dari minyak bumi?",
+        options: [
+          "Plastik, detergen, dan pupuk sintetis",
+          "Karet sintetis, pestisida, dan obat-obatan",
+          "Panel surya, turbin angin, dan baterai lithium",
+          "Lilin, krayon, dan kosmetik"
+        ],
+        correct: 2,
+        explanation: "Panel surya (dari silikon), turbin angin (dari logam dan komposit), dan baterai lithium TIDAK berasal dari minyak bumi. Mereka adalah teknologi energi terbarukan. Sementara plastik, karet sintetis, detergen, obat-obatan, kosmetik, dan banyak produk lainnya berasal dari petrokimia (turunan minyak bumi)."
+      },
+      {
+        id: 10,
+        question: "Apa yang dimaksud dengan teknologi fracking (hydraulic fracturing)?",
+        options: [
+          "Teknik memurnikan minyak mentah menjadi produk berkualitas tinggi",
+          "Metode ekstraksi minyak dari batuan shale dengan tekanan air tinggi",
+          "Proses mengubah minyak berat menjadi bensin melalui cracking",
+          "Teknologi menyimpan minyak dalam tangki bawah tanah"
+        ],
+        correct: 1,
+        explanation: "Fracking adalah metode ekstraksi minyak dan gas dari batuan shale (serpih) dengan memompa cairan bertekanan tinggi untuk memecah batuan. Teknologi ini telah mengubah lanskap energi global sejak 2000-an, terutama di Amerika Serikat."
+      }
+    ];
+
+    function startQuiz() {
+      const nameInput = document.getElementById('student-name');
+      const classInput = document.getElementById('student-class');
+      
+      if (!nameInput || !nameInput.value.trim()) {
+        showNotification('Mohon masukkan nama lengkap Anda', 'error');
+        return;
+      }
+      
+      studentName = nameInput.value.trim();
+      studentClass = classInput ? classInput.value.trim() : '';
+      currentPage = 'quiz';
+      currentQuestion = 0;
+      answers = {};
+      startTime = Date.now();
+      timeRemaining = 900;
+      score = 0;
+      
+      startTimer();
+      updateUI();
+    }
+
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      
+      timerInterval = setInterval(() => {
+        timeRemaining--;
+        
+        if (timeRemaining <= 0) {
+          clearInterval(timerInterval);
+          submitQuiz();
+        }
+        
+        const timerElement = document.getElementById('timer');
+        if (timerElement) {
+          const minutes = Math.floor(timeRemaining / 60);
+          const seconds = timeRemaining % 60;
+          timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+          
+          if (timeRemaining <= 60) {
+            timerElement.style.color = '#ef4444';
+          }
+        }
+      }, 1000);
+    }
+
+    function selectAnswer(questionId, optionIndex) {
+      const question = questions.find(q => q.id === questionId);
+      if (!question) return;
+      
+      answers[questionId] = optionIndex;
+      
+      const options = document.querySelectorAll(`.answer-option-${questionId}`);
+      options.forEach((option, index) => {
+        option.classList.remove('correct', 'incorrect');
+        const feedback = option.querySelector('.feedback');
+        if (feedback) feedback.remove();
+        
+        if (index === optionIndex) {
+          const isCorrect = optionIndex === question.correct;
+          option.classList.add(isCorrect ? 'correct' : 'incorrect');
+          
+          const feedbackDiv = document.createElement('div');
+          feedbackDiv.className = 'feedback mt-3 p-3 rounded-lg';
+          feedbackDiv.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+          feedbackDiv.style.color = 'white';
+          feedbackDiv.innerHTML = `
+            <div class="flex items-start space-x-2">
+              <span style="font-size: 24px;">${isCorrect ? '✓' : '✗'}</span>
+              <div>
+                <div style="font-weight: 600; margin-bottom: 4px;">
+                  ${isCorrect ? 'Benar!' : 'Kurang tepat.'}
+                </div>
+                <div style="font-size: 14px; line-height: 1.5; opacity: 0.95;">
+                  ${isCorrect ? question.explanation : `Jawaban yang benar adalah: <strong>${String.fromCharCode(65 + question.correct)}. ${question.options[question.correct]}</strong><br><br>${question.explanation}`}
+                </div>
+              </div>
+            </div>
+          `;
+          option.appendChild(feedbackDiv);
+        }
+      });
+      
+      updateUI();
+    }
+
+    function previousQuestion() {
+      if (currentQuestion > 0) {
+        currentQuestion--;
+        updateUI();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function nextQuestion() {
+      if (currentQuestion < questions.length - 1) {
+        currentQuestion++;
+        updateUI();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function submitQuiz() {
+      if (Object.keys(answers).length < questions.length) {
+        showNotification('Mohon jawab semua soal sebelum submit!', 'error');
+        return;
+      }
+      
+      if (timerInterval) {
+        clearInterval(timerInterval);
+      }
+      
+      score = 0;
+      questions.forEach(question => {
+        if (answers[question.id] === question.correct) {
+          score++;
+        }
+      });
+      
+      currentPage = 'result';
+      updateUI();
+      
+      if (score >= 8) {
+        createConfetti();
+      }
+    }
+
+    function createConfetti() {
+      const colors = ['#fbbf24', '#14b8a6', '#3b82f6', '#ef4444', '#10b981', '#8b5cf6'];
+      for (let i = 0; i < 100; i++) {
+        setTimeout(() => {
+          const confetti = document.createElement('div');
+          confetti.className = 'confetti';
+          confetti.style.left = Math.random() * 100 + 'vw';
+          confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+          confetti.style.animationDelay = Math.random() * 0.5 + 's';
+          confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+          document.body.appendChild(confetti);
+          
+          setTimeout(() => confetti.remove(), 3000);
+        }, i * 30);
+      }
+    }
+
+    function showNotification(message, type) {
+      const notification = document.createElement('div');
+      notification.className = 'fixed top-4 right-4 px-6 py-4 rounded-lg shadow-lg z-50 fade-in';
+      notification.style.backgroundColor = type === 'error' ? '#ef4444' : '#10b981';
+      notification.style.color = 'white';
+      notification.style.fontWeight = '600';
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
+    }
+
+    async function downloadResult() {
+      const resultElement = document.getElementById('result-container');
+      if (!resultElement) return;
+      
+      try {
+        const canvas = await html2canvas(resultElement, {
+          backgroundColor: config.background_color || defaultConfig.background_color,
+          scale: 2
+        });
+        
+        const link = document.createElement('a');
+        link.download = `Hasil_Kuis_${studentName.replace(/\s/g, '_')}_${new Date().toLocaleDateString('id-ID')}.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+        
+        showNotification('Hasil kuis berhasil diunduh!', 'success');
+      } catch (error) {
+        showNotification('Gagal mengunduh hasil. Coba lagi.', 'error');
+      }
+    }
+
+    function retryQuiz() {
+      currentPage = 'welcome';
+      currentQuestion = 0;
+      answers = {};
+      score = 0;
+      timeRemaining = 900;
+      if (timerInterval) clearInterval(timerInterval);
+      updateUI();
+    }
+
+    function getFeedbackMessage(score) {
+      const percentage = (score / questions.length) * 100;
+      
+      if (percentage >= 90) {
+        return {
+          title: "🎉 Luar Biasa!",
+          message: "Pemahaman kamu tentang minyak bumi sangat sempurna! Pertahankan prestasi ini!",
+          color: "#10b981"
+        };
+      } else if (percentage >= 70) {
+        return {
+          title: "👍 Bagus!",
+          message: "Kamu sudah memahami materi dengan baik. Terus tingkatkan pemahaman kamu!",
+          color: "#14b8a6"
+        };
+      } else if (percentage >= 50) {
+        return {
+          title: "📚 Cukup Baik",
+          message: "Kamu sudah di jalur yang benar. Pelajari lagi materinya untuk hasil yang lebih baik!",
+          color: "#f59e0b"
+        };
+      } else {
+        return {
+          title: "💪 Tetap Semangat!",
+          message: "Jangan menyerah! Ulangi materinya dan coba lagi. Kamu pasti bisa lebih baik!",
+          color: "#ef4444"
+        };
+      }
+    }
+
+    function createWelcomePage() {
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const bgColor = config.background_color || defaultConfig.background_color;
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_action || defaultConfig.primary_action;
+
+      return `
+        <div class="max-w-2xl mx-auto px-4 py-12 fade-in">
+          <div class="rounded-2xl p-8" style="background-color: ${surfaceColor};">
+            <div class="text-center mb-8">
+              <div style="font-size: ${baseSize * 4}px; margin-bottom: 16px;">📝</div>
+              <h1 style="font-size: ${baseSize * 2}px; font-weight: 800; color: ${textColor}; margin-bottom: 12px;">
+                ${config.welcome_title || defaultConfig.welcome_title}
+              </h1>
+              <p style="font-size: ${baseSize * 1.1}px; color: ${textColor}; opacity: 0.8; line-height: 1.6;">
+                ${config.welcome_subtitle || defaultConfig.welcome_subtitle}
+              </p>
+            </div>
+
+            <div class="p-6 rounded-xl mb-6" style="background-color: ${bgColor}; border: 2px solid ${primaryColor};">
+              <div class="flex items-center justify-center space-x-4 text-center flex-wrap gap-4">
+                <div>
+                  <div style="font-size: ${baseSize * 2}px; font-weight: 800; color: ${primaryColor};">10</div>
+                  <div style="font-size: ${baseSize * 0.9}px; color: ${textColor}; opacity: 0.7;">Soal</div>
+                </div>
+                <div style="font-size: ${baseSize * 1.5}px; color: ${primaryColor};">•</div>
+                <div>
+                  <div style="font-size: ${baseSize * 2}px; font-weight: 800; color: ${primaryColor};">15</div>
+                  <div style="font-size: ${baseSize * 0.9}px; color: ${textColor}; opacity: 0.7;">Menit</div>
+                </div>
+                <div style="font-size: ${baseSize * 1.5}px; color: ${primaryColor};">•</div>
+                <div>
+                  <div style="font-size: ${baseSize * 2}px; font-weight: 800; color: ${primaryColor};">100</div>
+                  <div style="font-size: ${baseSize * 0.9}px; color: ${textColor}; opacity: 0.7;">Poin</div>
+                </div>
+              </div>
+            </div>
+
+            <form onsubmit="event.preventDefault(); startQuiz();" class="space-y-4">
+              <div>
+                <label style="font-size: ${baseSize * 0.95}px; font-weight: 600; color: ${textColor}; display: block; margin-bottom: 8px;">
+                  ${config.name_label || defaultConfig.name_label} *
+                </label>
+                <input 
+                  type="text" 
+                  id="student-name"
+                  required
+                  placeholder="Masukkan nama lengkap"
+                  class="w-full px-4 py-3 rounded-lg"
+                  style="background-color: ${bgColor}; border: 2px solid ${primaryColor}33; color: ${textColor}; font-size: ${baseSize}px;"
+                />
+              </div>
+
+              <div>
+                <label style="font-size: ${baseSize * 0.95}px; font-weight: 600; color: ${textColor}; display: block; margin-bottom: 8px;">
+                  ${config.class_label || defaultConfig.class_label}
+                </label>
+                <input 
+                  type="text" 
+                  id="student-class"
+                  placeholder="Contoh: XI IPA 1"
+                  class="w-full px-4 py-3 rounded-lg"
+                  style="background-color: ${bgColor}; border: 2px solid ${primaryColor}33; color: ${textColor}; font-size: ${baseSize}px;"
+                />
+              </div>
+
+              <button 
+                type="submit"
+                class="w-full py-4 rounded-lg font-bold transition-all hover:scale-105"
+                style="background: linear-gradient(135deg, ${primaryColor} 0%, ${config.secondary_action || defaultConfig.secondary_action} 100%); color: ${bgColor}; font-size: ${baseSize * 1.1}px;">
+                ${config.start_button || defaultConfig.start_button}
+              </button>
+            </form>
+
+            <div class="mt-6 p-4 rounded-lg" style="background-color: ${bgColor};">
+              <p style="font-size: ${baseSize * 0.85}px; color: ${textColor}; opacity: 0.7; text-align: center; line-height: 1.6;">
+                💡 Tips: Baca setiap soal dengan teliti dan perhatikan penjelasan setelah memilih jawaban untuk pembelajaran optimal!
+              </p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function createQuizPage() {
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const bgColor = config.background_color || defaultConfig.background_color;
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_action || defaultConfig.primary_action;
+
+      const question = questions[currentQuestion];
+      const progress = ((currentQuestion + 1) / questions.length) * 100;
+      const minutes = Math.floor(timeRemaining / 60);
+      const seconds = timeRemaining % 60;
+
+      return `
+        <div class="max-w-4xl mx-auto px-4 py-8">
+          <!-- Header -->
+          <div class="rounded-2xl p-6 mb-6" style="background-color: ${surfaceColor};">
+            <div class="flex items-center justify-between mb-4 flex-wrap gap-4">
+              <div>
+                <div style="font-size: ${baseSize * 0.85}px; color: ${textColor}; opacity: 0.7; margin-bottom: 4px;">
+                  Peserta
+                </div>
+                <div style="font-size: ${baseSize * 1.1}px; font-weight: 600; color: ${textColor};">
+                  ${studentName}${studentClass ? ` - ${studentClass}` : ''}
+                </div>
+              </div>
+              <div class="text-right">
+                <div style="font-size: ${baseSize * 0.85}px; color: ${textColor}; opacity: 0.7; margin-bottom: 4px;">
+                  Waktu Tersisa
+                </div>
+                <div id="timer" class="timer" style="font-size: ${baseSize * 1.5}px; font-weight: 800; color: ${primaryColor};">
+                  ${minutes}:${seconds.toString().padStart(2, '0')}
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span style="font-size: ${baseSize * 0.9}px; font-weight: 600; color: ${textColor};">
+                  Soal ${currentQuestion + 1} dari ${questions.length}
+                </span>
+                <span style="font-size: ${baseSize * 0.9}px; font-weight: 600; color: ${primaryColor};">
+                  ${Math.round(progress)}%
+                </span>
+              </div>
+              <div class="w-full h-3 rounded-full" style="background-color: ${bgColor};">
+                <div class="progress-bar h-full rounded-full" 
+                     style="width: ${progress}%; background: linear-gradient(90deg, ${primaryColor} 0%, ${config.secondary_action || defaultConfig.secondary_action} 100%);"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Question Card -->
+          <div class="rounded-2xl p-8 mb-6 fade-in" style="background-color: ${surfaceColor};">
+            <div class="flex items-start space-x-4 mb-6">
+              <div class="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center"
+                   style="background: linear-gradient(135deg, ${primaryColor} 0%, ${config.secondary_action || defaultConfig.secondary_action} 100%);">
+                <span style="font-size: ${baseSize * 1.3}px; font-weight: 800; color: white;">
+                  ${currentQuestion + 1}
+                </span>
+              </div>
+              <h2 style="font-size: ${baseSize * 1.3}px; font-weight: 600; color: ${textColor}; line-height: 1.5; flex: 1;">
+                ${question.question}
+              </h2>
+            </div>
+
+            <div class="space-y-3">
+              ${question.options.map((option, index) => `
+                <div class="answer-option answer-option-${question.id} rounded-xl p-4 border-2 transition-all"
+                     style="background-color: ${answers[question.id] === index ? primaryColor + '22' : bgColor}; 
+                            border-color: ${answers[question.id] === index ? primaryColor : 'transparent'};"
+                     onclick="selectAnswer(${question.id}, ${index})">
+                  <label class="flex items-start space-x-4 cursor-pointer">
+                    <input 
+                      type="radio" 
+                      name="question-${question.id}"
+                      class="custom-radio"
+                      style="border-color: ${primaryColor}; color: ${primaryColor};"
+                      ${answers[question.id] === index ? 'checked' : ''}
+                    />
+                    <div style="flex: 1;">
+                      <div style="font-size: ${baseSize}px; color: ${textColor}; line-height: 1.6;">
+                        <strong>${String.fromCharCode(65 + index)}.</strong> ${option}
+                      </div>
+                    </div>
+                  </label>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Navigation -->
+          <div class="flex items-center justify-between gap-4">
+            <button 
+              onclick="previousQuestion()"
+              ${currentQuestion === 0 ? 'disabled' : ''}
+              class="px-6 py-3 rounded-lg font-semibold transition-all"
+              style="background-color: ${currentQuestion === 0 ? surfaceColor : primaryColor}; 
+                     color: ${currentQuestion === 0 ? textColor : bgColor}; 
+                     opacity: ${currentQuestion === 0 ? '0.5' : '1'};
+                     cursor: ${currentQuestion === 0 ? 'not-allowed' : 'pointer'};
+                     font-size: ${baseSize * 0.95}px;">
+              ${config.prev_button || defaultConfig.prev_button}
+            </button>
+
+            ${currentQuestion === questions.length - 1 ? `
+              <button 
+                onclick="submitQuiz()"
+                class="px-8 py-3 rounded-lg font-bold transition-all hover:scale-105"
+                style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
+                       color: white; 
+                       font-size: ${baseSize}px;">
+                ${config.submit_button || defaultConfig.submit_button}
+              </button>
+            ` : `
+              <button 
+                onclick="nextQuestion()"
+                class="px-6 py-3 rounded-lg font-semibold transition-all"
+                style="background-color: ${primaryColor}; 
+                       color: ${bgColor}; 
+                       font-size: ${baseSize * 0.95}px;">
+                ${config.next_button || defaultConfig.next_button}
+              </button>
+            `}
+          </div>
+        </div>
+      `;
+    }
+
+    function createResultPage() {
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const bgColor = config.background_color || defaultConfig.background_color;
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_action || defaultConfig.primary_action;
+
+      const percentage = (score / questions.length) * 100;
+      const feedback = getFeedbackMessage(score);
+      const totalTime = Math.floor((Date.now() - startTime) / 1000);
+      const timeMinutes = Math.floor(totalTime / 60);
+      const timeSeconds = totalTime % 60;
+
+      return `
+        <div class="max-w-4xl mx-auto px-4 py-8">
+          <div id="result-container" class="rounded-2xl p-8" style="background-color: ${surfaceColor};">
+            <!-- Header -->
+            <div class="text-center mb-8">
+              <div style="font-size: ${baseSize * 0.9}px; color: ${textColor}; opacity: 0.7; margin-bottom: 8px;">
+                ${config.result_title || defaultConfig.result_title}
+              </div>
+              <h1 style="font-size: ${baseSize * 2}px; font-weight: 800; color: ${textColor}; margin-bottom: 4px;">
+                ${studentName}
+              </h1>
+              ${studentClass ? `
+                <div style="font-size: ${baseSize * 1.1}px; color: ${textColor}; opacity: 0.8;">
+                  ${studentClass}
+                </div>
+              ` : ''}
+              <div style="font-size: ${baseSize * 0.85}px; color: ${textColor}; opacity: 0.6; margin-top: 8px;">
+                ${new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+              </div>
+            </div>
+
+            <!-- Score Circle -->
+            <div class="flex justify-center mb-8">
+              <div class="score-circle rounded-full flex flex-col items-center justify-center"
+                   style="width: 200px; height: 200px; background: linear-gradient(135deg, ${feedback.color} 0%, ${feedback.color}dd 100%); box-shadow: 0 10px 40px ${feedback.color}66;">
+                <div style="font-size: ${baseSize * 3.5}px; font-weight: 900; color: white; line-height: 1;">
+                  ${Math.round(percentage)}
+                </div>
+                <div style="font-size: ${baseSize * 1.5}px; font-weight: 600; color: white; opacity: 0.9;">
+                  /100
+                </div>
+              </div>
+            </div>
+
+            <!-- Feedback -->
+            <div class="text-center mb-8">
+              <h2 style="font-size: ${baseSize * 1.8}px; font-weight: 700; color: ${textColor}; margin-bottom: 12px;">
+                ${feedback.title}
+              </h2>
+              <p style="font-size: ${baseSize * 1.1}px; color: ${textColor}; opacity: 0.8; line-height: 1.6; max-width: 600px; margin: 0 auto;">
+                ${feedback.message}
+              </p>
+            </div>
+
+            <!-- Statistics -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+              <div class="rounded-xl p-6 text-center" style="background-color: ${bgColor};">
+                <div style="font-size: ${baseSize * 2.5}px; margin-bottom: 8px;">✓</div>
+                <div style="font-size: ${baseSize * 2}px; font-weight: 800; color: #10b981; margin-bottom: 4px;">
+                  ${score}
+                </div>
+                <div style="font-size: ${baseSize * 0.9}px; color: ${textColor}; opacity: 0.7;">
+                  Jawaban Benar
+                </div>
+              </div>
+
+              <div class="rounded-xl p-6 text-center" style="background-color: ${bgColor};">
+                <div style="font-size: ${baseSize * 2.5}px; margin-bottom: 8px;">✗</div>
+                <div style="font-size: ${baseSize * 2}px; font-weight: 800; color: #ef4444; margin-bottom: 4px;">
+                  ${questions.length - score}
+                </div>
+                <div style="font-size: ${baseSize * 0.9}px; color: ${textColor}; opacity: 0.7;">
+                  Jawaban Salah
+                </div>
+              </div>
+
+              <div class="rounded-xl p-6 text-center" style="background-color: ${bgColor};">
+                <div style="font-size: ${baseSize * 2.5}px; margin-bottom: 8px;">⏱️</div>
+                <div style="font-size: ${baseSize * 2}px; font-weight: 800; color: ${primaryColor}; margin-bottom: 4px;">
+                  ${timeMinutes}:${timeSeconds.toString().padStart(2, '0')}
+                </div>
+                <div style="font-size: ${baseSize * 0.9}px; color: ${textColor}; opacity: 0.7;">
+                  Waktu Pengerjaan
+                </div>
+              </div>
+            </div>
+
+            <!-- Review -->
+            <div class="rounded-xl p-6 mb-8" style="background-color: ${bgColor};">
+              <h3 style="font-size: ${baseSize * 1.2}px; font-weight: 700; color: ${textColor}; margin-bottom: 16px;">
+                📝 Review Jawaban
+              </h3>
+              <div class="space-y-3">
+                ${questions.map((q, idx) => {
+                  const isCorrect = answers[q.id] === q.correct;
+                  return `
+                    <div class="flex items-center justify-between p-3 rounded-lg" 
+                         style="background-color: ${surfaceColor};">
+                      <div class="flex items-center space-x-3">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center"
+                             style="background-color: ${isCorrect ? '#10b981' : '#ef4444'};">
+                          <span style="color: white; font-weight: 700; font-size: ${baseSize * 0.9}px;">
+                            ${idx + 1}
+                          </span>
+                        </div>
+                        <div style="font-size: ${baseSize * 0.9}px; color: ${textColor};">
+                          ${q.question.substring(0, 50)}...
+                        </div>
+                      </div>
+                      <div style="font-size: ${baseSize * 1.5}px;">
+                        ${isCorrect ? '✓' : '✗'}
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex flex-col sm:flex-row gap-4">
+              <button 
+                onclick="downloadResult()"
+                class="flex-1 py-4 rounded-lg font-bold transition-all hover:scale-105"
+                style="background: linear-gradient(135deg, ${primaryColor} 0%, ${config.secondary_action || defaultConfig.secondary_action} 100%); color: ${bgColor}; font-size: ${baseSize}px;">
+                ${config.download_button || defaultConfig.download_button}
+              </button>
+              <button 
+                onclick="retryQuiz()"
+                class="flex-1 py-4 rounded-lg font-bold transition-all hover:scale-105"
+                style="background-color: ${bgColor}; border: 2px solid ${primaryColor}; color: ${primaryColor}; font-size: ${baseSize}px;">
+                ${config.retry_button || defaultConfig.retry_button}
+              </button>
+              <button 
+                onclick="window.history.back()"
+                class="flex-1 py-4 rounded-lg font-bold transition-all hover:scale-105"
+                style="background-color: ${bgColor}; border: 2px solid ${config.secondary_action || defaultConfig.secondary_action}; color: ${config.secondary_action || defaultConfig.secondary_action}; font-size: ${baseSize}px;">
+                ${config.home_button || defaultConfig.home_button}
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function createApp() {
+      const bgColor = config.background_color || defaultConfig.background_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const customFont = config.font_family || defaultConfig.font_family;
+
+      let pageContent = '';
+      if (currentPage === 'welcome') {
+        pageContent = createWelcomePage();
+      } else if (currentPage === 'quiz') {
+        pageContent = createQuizPage();
+      } else if (currentPage === 'result') {
+        pageContent = createResultPage();
+      }
+
+      return `
+        <div class="w-full min-h-full" style="background-color: ${bgColor}; color: ${textColor}; font-family: '${customFont}', sans-serif;">
+          ${pageContent}
+        </div>
+      `;
+    }
+
+    async function onConfigChange(newConfig) {
+      config = { ...config, ...newConfig };
+      updateUI();
+    }
+
+    function updateUI() {
+      const app = document.getElementById('app');
+      if (app) {
+        app.innerHTML = createApp();
+      }
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [
+          {
+            get: () => config.background_color || defaultConfig.background_color,
+            set: (value) => {
+              config.background_color = value;
+              window.elementSdk.setConfig({ background_color: value });
+            }
+          },
+          {
+            get: () => config.surface_color || defaultConfig.surface_color,
+            set: (value) => {
+              config.surface_color = value;
+              window.elementSdk.setConfig({ surface_color: value });
+            }
+          },
+          {
+            get: () => config.text_color || defaultConfig.text_color,
+            set: (value) => {
+              config.text_color = value;
+              window.elementSdk.setConfig({ text_color: value });
+            }
+          },
+          {
+            get: () => config.primary_action || defaultConfig.primary_action,
+            set: (value) => {
+              config.primary_action = value;
+              window.elementSdk.setConfig({ primary_action: value });
+            }
+          },
+          {
+            get: () => config.secondary_action || defaultConfig.secondary_action,
+            set: (value) => {
+              config.secondary_action = value;
+              window.elementSdk.setConfig({ secondary_action: value });
+            }
+          }
+        ],
+        borderables: [],
+        fontEditable: {
+          get: () => config.font_family || defaultConfig.font_family,
+          set: (value) => {
+            config.font_family = value;
+            window.elementSdk.setConfig({ font_family: value });
+          }
+        },
+        fontSizeable: {
+          get: () => config.font_size || defaultConfig.font_size,
+          set: (value) => {
+            config.font_size = value;
+            window.elementSdk.setConfig({ font_size: value });
+          }
+        }
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ["welcome_title", config.welcome_title || defaultConfig.welcome_title],
+        ["welcome_subtitle", config.welcome_subtitle || defaultConfig.welcome_subtitle],
+        ["name_label", config.name_label || defaultConfig.name_label],
+        ["class_label", config.class_label || defaultConfig.class_label],
+        ["start_button", config.start_button || defaultConfig.start_button],
+        ["quiz_info", config.quiz_info || defaultConfig.quiz_info],
+        ["prev_button", config.prev_button || defaultConfig.prev_button],
+        ["next_button", config.next_button || defaultConfig.next_button],
+        ["submit_button", config.submit_button || defaultConfig.submit_button],
+        ["result_title", config.result_title || defaultConfig.result_title],
+        ["download_button", config.download_button || defaultConfig.download_button],
+        ["retry_button", config.retry_button || defaultConfig.retry_button],
+        ["home_button", config.home_button || defaultConfig.home_button]
+      ]);
+    }
+
+    async function init() {
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig,
+          onConfigChange,
+          mapToCapabilities,
+          mapToEditPanelValues
+        });
+        
+        config = window.elementSdk.config;
+      }
+      
+      updateUI();
+    }
+
+    window.startQuiz = startQuiz;
+    window.selectAnswer = selectAnswer;
+    window.previousQuestion = previousQuestion;
+    window.nextQuestion = nextQuestion;
+    window.submitQuiz = submitQuiz;
+    window.downloadResult = downloadResult;
+    window.retryQuiz = retryQuiz;
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a3ed6c05053051a',t:'MTc2NDA0OTUxNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

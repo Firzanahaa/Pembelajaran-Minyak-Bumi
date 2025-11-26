@@ -1,0 +1,730 @@
+<!doctype html>
+<html lang="id">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fun Facts Minyak Bumi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+    
+    * {
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .fact-card {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .fact-card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .fact-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+    
+    .random-fact-animation {
+      animation: randomPulse 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    @keyframes randomPulse {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 0 30px rgba(251, 191, 36, 0.6);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+    
+    .filter-btn {
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .filter-btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+    
+    .filter-btn:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+    
+    .counter-badge {
+      animation: bounce 2s infinite;
+    }
+    
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+    
+    .slide-fade {
+      animation: slideFade 0.5s ease-out;
+    }
+    
+    @keyframes slideFade {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    .timeline-item {
+      position: relative;
+      padding-left: 50px;
+      margin-bottom: 40px;
+    }
+    
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: 15px;
+      top: 15px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 4px solid;
+      background: currentColor;
+      z-index: 2;
+    }
+    
+    .timeline-item::after {
+      content: '';
+      position: absolute;
+      left: 24px;
+      top: 40px;
+      width: 3px;
+      height: calc(100% + 20px);
+      background: linear-gradient(180deg, currentColor 0%, transparent 100%);
+    }
+    
+    .timeline-item:last-child::after {
+      display: none;
+    }
+    
+    .bar-chart {
+      height: 30px;
+      border-radius: 8px;
+      transition: width 1s ease-out;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .bar-chart::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      animation: shimmer 2s infinite;
+    }
+    
+    @keyframes shimmer {
+      to {
+        left: 100%;
+      }
+    }
+    
+    .icon-container {
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 16px;
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="min-h-full">
+  <div id="app" class="w-full min-h-full"></div>
+  <script>
+    const defaultConfig = {
+      page_title: "Fun Facts Minyak Bumi",
+      nav_back: "← Kembali ke Beranda",
+      main_title: "Fakta Menarik Minyak Bumi",
+      subtitle: "Jelajahi fakta-fakta mengejutkan dan edukatif tentang minyak bumi yang mungkin belum kamu ketahui!",
+      random_button: "🎲 Random Fact",
+      reset_button: "Reset Counter",
+      did_you_know_title: "💡 Tahukah Kamu?",
+      infographic_title: "📊 Konsumsi Minyak Dunia (2023)",
+      timeline_title: "📅 Timeline Sejarah Minyak Bumi",
+      background_color: "#0f172a",
+      surface_color: "#1e293b",
+      text_color: "#f1f5f9",
+      primary_action: "#fbbf24",
+      secondary_action: "#14b8a6",
+      font_family: "Poppins",
+      font_size: 16
+    };
+
+    let config = { ...defaultConfig };
+    let activeFilter = 'all';
+    let factsRead = 0;
+    let currentDidYouKnowIndex = 0;
+    let didYouKnowInterval;
+
+    const funFacts = [
+      {
+        id: 1,
+        category: "sejarah",
+        icon: "🦴",
+        text: "Minyak bumi terbentuk dari organisme laut mikroskopis yang mati dan tertimbun selama 10-600 juta tahun yang lalu. Proses ini disebut diagenesis dan katagenesis."
+      },
+      {
+        id: 2,
+        category: "ekonomi",
+        icon: "🌏",
+        text: "Indonesia pernah menjadi anggota OPEC (Organization of Petroleum Exporting Countries) dari tahun 1962-2008, kemudian bergabung lagi pada 2016 dan keluar kembali di 2016."
+      },
+      {
+        id: 3,
+        category: "teknologi",
+        icon: "🛢️",
+        text: "Satu barel minyak setara dengan 159 liter atau 42 gallon. Standar ini ditetapkan pada tahun 1866 dan masih digunakan hingga sekarang di seluruh dunia."
+      },
+      {
+        id: 4,
+        category: "teknologi",
+        icon: "💊",
+        text: "Plastik, karet sintetis, detergen, pupuk, pestisida, dan banyak obat-obatan modern berasal dari produk sampingan pengolahan minyak bumi (petrokimia)."
+      },
+      {
+        id: 5,
+        category: "ekonomi",
+        icon: "🕌",
+        text: "Arab Saudi memiliki cadangan minyak terbesar kedua di dunia dengan sekitar 17% dari cadangan global, sementara Venezuela memiliki yang terbesar dengan 18%."
+      },
+      {
+        id: 6,
+        category: "sejarah",
+        icon: "⛏️",
+        text: "Sumur minyak tertua yang masih beroperasi ada di McClintock Well No. 1, Pennsylvania, Amerika Serikat. Sumur ini telah beroperasi sejak tahun 1861!"
+      },
+      {
+        id: 7,
+        category: "teknologi",
+        icon: "🖍️",
+        text: "Minyak bumi tidak hanya untuk bahan bakar! Produk turunannya termasuk lilin, krayon, kosmetik, parfum, dan bahkan chewing gum."
+      },
+      {
+        id: 8,
+        category: "lingkungan",
+        icon: "⏳",
+        text: "Proses pembentukan minyak bumi membutuhkan waktu 10-600 juta tahun. Karena itu, minyak bumi disebut sumber energi TIDAK TERBARUKAN."
+      },
+      {
+        id: 9,
+        category: "ekonomi",
+        icon: "🚗",
+        text: "Sekitar 50% dari seluruh minyak bumi yang diproduksi digunakan untuk sektor transportasi (mobil, pesawat, kapal, dll)."
+      },
+      {
+        id: 10,
+        category: "ekonomi",
+        icon: "🇻🇪",
+        text: "Venezuela memiliki cadangan minyak terbukti terbesar di dunia dengan 303.8 miliar barel, meskipun produksinya menurun drastis dalam dekade terakhir."
+      },
+      {
+        id: 11,
+        category: "ekonomi",
+        icon: "👷",
+        text: "Industri minyak dan gas mempekerjakan lebih dari 10 juta orang secara langsung di seluruh dunia, dan menciptakan puluhan juta lapangan kerja tidak langsung."
+      },
+      {
+        id: 12,
+        category: "teknologi",
+        icon: "💥",
+        text: "Teknologi hydraulic fracturing (fracking) telah mengubah lanskap energi global sejak 2000-an, memungkinkan ekstraksi minyak dari batuan shale."
+      },
+      {
+        id: 13,
+        category: "sejarah",
+        icon: "🏛️",
+        text: "Orang-orang Mesopotamia kuno (3000 SM) sudah menggunakan aspal (produk minyak bumi) untuk waterproofing perahu dan bangunan."
+      },
+      {
+        id: 14,
+        category: "lingkungan",
+        icon: "🌡️",
+        text: "Pembakaran bahan bakar fosil menyumbang sekitar 75% dari total emisi gas rumah kaca global yang menyebabkan perubahan iklim."
+      }
+    ];
+
+    const didYouKnowFacts = [
+      "Dalam 1 barel minyak mentah, 19 galon menjadi bensin, 10 galon menjadi diesel, dan sisanya menjadi berbagai produk lain",
+      "Dunia mengkonsumsi sekitar 100 juta barel minyak per hari atau 1,160 barel per detik!",
+      "Minyak bumi ditemukan di kedalaman 1-5 km di bawah permukaan bumi",
+      "70% minyak dunia diproduksi dari ladang yang ditemukan sebelum tahun 1970",
+      "Satu tetes minyak dapat mencemari hingga 25 liter air bersih"
+    ];
+
+    const consumptionData = [
+      { country: "Amerika Serikat", consumption: 20, color: "#ef4444" },
+      { country: "China", consumption: 15, color: "#f59e0b" },
+      { country: "India", consumption: 5, color: "#10b981" },
+      { country: "Jepang", consumption: 4, color: "#3b82f6" },
+      { country: "Arab Saudi", consumption: 4, color: "#8b5cf6" }
+    ];
+
+    const timeline = [
+      { year: "1859", event: "Sumur Minyak Modern Pertama", desc: "Edwin Drake mengebor sumur minyak komersial pertama di Titusville, Pennsylvania" },
+      { year: "1901", event: "Penemuan Ladang Spindletop", desc: "Ledakan minyak besar di Texas mengubah industri energi Amerika" },
+      { year: "1960", event: "Pembentukan OPEC", desc: "5 negara membentuk OPEC untuk mengontrol harga minyak global" },
+      { year: "1973", event: "Krisis Minyak Pertama", desc: "Embargo OPEC menyebabkan kelangkaan dan lonjakan harga minyak" },
+      { year: "2008", event: "Harga Minyak Mencapai $147", desc: "Rekor harga minyak tertinggi sebelum krisis finansial global" },
+      { year: "2020", event: "Harga Minyak Negatif", desc: "Untuk pertama kalinya dalam sejarah, harga minyak WTI jatuh ke nilai negatif akibat pandemi COVID-19" }
+    ];
+
+    function filterFacts(category) {
+      activeFilter = category;
+      updateUI();
+      setTimeout(() => {
+        observeFactCards();
+      }, 100);
+    }
+
+    function showRandomFact() {
+      const cards = document.querySelectorAll('.fact-card');
+      const randomIndex = Math.floor(Math.random() * cards.length);
+      const randomCard = cards[randomIndex];
+      
+      if (randomCard) {
+        randomCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        randomCard.classList.add('random-fact-animation');
+        setTimeout(() => {
+          randomCard.classList.remove('random-fact-animation');
+        }, 600);
+        
+        if (!randomCard.classList.contains('fact-read')) {
+          randomCard.classList.add('fact-read');
+          factsRead++;
+          updateUI();
+        }
+      }
+    }
+
+    function resetCounter() {
+      factsRead = 0;
+      document.querySelectorAll('.fact-card').forEach(card => {
+        card.classList.remove('fact-read');
+      });
+      updateUI();
+    }
+
+    function markAsRead(factId) {
+      const card = document.getElementById(`fact-${factId}`);
+      if (card && !card.classList.contains('fact-read')) {
+        card.classList.add('fact-read');
+        factsRead++;
+        updateUI();
+      }
+    }
+
+    function observeFactCards() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.1 });
+
+      document.querySelectorAll('.fact-card').forEach(card => {
+        observer.observe(card);
+      });
+    }
+
+    function startDidYouKnowRotation() {
+      if (didYouKnowInterval) {
+        clearInterval(didYouKnowInterval);
+      }
+      
+      didYouKnowInterval = setInterval(() => {
+        currentDidYouKnowIndex = (currentDidYouKnowIndex + 1) % didYouKnowFacts.length;
+        const element = document.getElementById('did-you-know-text');
+        if (element) {
+          element.classList.remove('slide-fade');
+          void element.offsetWidth;
+          element.classList.add('slide-fade');
+          element.textContent = didYouKnowFacts[currentDidYouKnowIndex];
+        }
+      }, 5000);
+    }
+
+    function createApp() {
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const bgColor = config.background_color || defaultConfig.background_color;
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_action || defaultConfig.primary_action;
+      const secondaryColor = config.secondary_action || defaultConfig.secondary_action;
+
+      const filteredFacts = activeFilter === 'all' 
+        ? funFacts 
+        : funFacts.filter(fact => fact.category === activeFilter);
+
+      return `
+        <div class="w-full min-h-full" style="background-color: ${bgColor}; color: ${textColor}; font-family: '${customFont}', sans-serif;">
+          <!-- Header -->
+          <header class="w-full sticky top-0 z-40" style="background-color: ${surfaceColor}; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+              <button onclick="window.history.back()" 
+                      class="hover:opacity-80 transition-opacity"
+                      style="color: ${primaryColor}; font-size: ${baseSize * 0.9}px;">
+                ${config.nav_back || defaultConfig.nav_back}
+              </button>
+              <h1 style="font-size: ${baseSize * 1.25}px; font-weight: 700; color: ${textColor};">
+                ${config.page_title || defaultConfig.page_title}
+              </h1>
+              <div class="counter-badge flex items-center space-x-2 px-4 py-2 rounded-full" 
+                   style="background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%);">
+                <span style="font-size: ${baseSize * 1.1}px; font-weight: 700; color: white;">
+                  ${factsRead}/${funFacts.length}
+                </span>
+                <span style="font-size: ${baseSize * 0.8}px; color: white;">dibaca</span>
+              </div>
+            </div>
+          </header>
+
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Hero Section -->
+            <div class="rounded-2xl p-8 mb-8" style="background: linear-gradient(135deg, ${primaryColor}33 0%, ${secondaryColor}33 100%); border: 2px solid ${primaryColor};">
+              <div class="text-center">
+                <h2 style="font-size: ${baseSize * 2.5}px; font-weight: 800; color: ${textColor}; margin-bottom: 16px;">
+                  ${config.main_title || defaultConfig.main_title} 🎉
+                </h2>
+                <p style="font-size: ${baseSize * 1.1}px; color: ${textColor}; opacity: 0.9; max-width: 800px; margin: 0 auto 24px;">
+                  ${config.subtitle || defaultConfig.subtitle}
+                </p>
+                <div class="flex flex-wrap gap-3 justify-center">
+                  <button onclick="showRandomFact()" 
+                          class="filter-btn px-6 py-3 rounded-full font-semibold"
+                          style="background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%); color: white; font-size: ${baseSize}px;">
+                    ${config.random_button || defaultConfig.random_button}
+                  </button>
+                  <button onclick="resetCounter()" 
+                          class="filter-btn px-6 py-3 rounded-full font-semibold"
+                          style="background-color: ${surfaceColor}; border: 2px solid ${secondaryColor}; color: ${secondaryColor}; font-size: ${baseSize}px;">
+                    ${config.reset_button || defaultConfig.reset_button}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Did You Know Section -->
+            <div class="rounded-2xl p-6 mb-8" 
+                 style="background: linear-gradient(135deg, ${secondaryColor} 0%, ${primaryColor} 100%); position: relative; overflow: hidden;"
+                 onmouseenter="clearInterval(didYouKnowInterval)"
+                 onmouseleave="startDidYouKnowRotation()">
+              <div style="font-size: ${baseSize * 1.8}px; font-weight: 700; color: white; margin-bottom: 12px; text-align: center;">
+                ${config.did_you_know_title || defaultConfig.did_you_know_title}
+              </div>
+              <p id="did-you-know-text" class="slide-fade" 
+                 style="font-size: ${baseSize * 1.1}px; color: white; text-align: center; line-height: 1.6; max-width: 900px; margin: 0 auto;">
+                ${didYouKnowFacts[0]}
+              </p>
+              <div class="flex justify-center gap-2 mt-4">
+                ${didYouKnowFacts.map((_, idx) => `
+                  <div style="width: 8px; height: 8px; border-radius: 50%; background-color: ${idx === currentDidYouKnowIndex ? 'white' : 'rgba(255,255,255,0.4)'}; transition: all 0.3s;"></div>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- Filter Buttons -->
+            <div class="flex flex-wrap gap-3 justify-center mb-8">
+              <button onclick="filterFacts('all')" 
+                      class="filter-btn px-6 py-3 rounded-full font-semibold"
+                      style="background: ${activeFilter === 'all' ? `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)` : surfaceColor}; 
+                             color: ${activeFilter === 'all' ? 'white' : textColor}; 
+                             border: 2px solid ${activeFilter === 'all' ? 'transparent' : primaryColor};
+                             font-size: ${baseSize * 0.9}px;">
+                🌟 Semua Fakta
+              </button>
+              <button onclick="filterFacts('sejarah')" 
+                      class="filter-btn px-6 py-3 rounded-full font-semibold"
+                      style="background: ${activeFilter === 'sejarah' ? `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)` : surfaceColor}; 
+                             color: ${activeFilter === 'sejarah' ? 'white' : textColor}; 
+                             border: 2px solid ${activeFilter === 'sejarah' ? 'transparent' : primaryColor};
+                             font-size: ${baseSize * 0.9}px;">
+                📜 Sejarah
+              </button>
+              <button onclick="filterFacts('teknologi')" 
+                      class="filter-btn px-6 py-3 rounded-full font-semibold"
+                      style="background: ${activeFilter === 'teknologi' ? `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)` : surfaceColor}; 
+                             color: ${activeFilter === 'teknologi' ? 'white' : textColor}; 
+                             border: 2px solid ${activeFilter === 'teknologi' ? 'transparent' : primaryColor};
+                             font-size: ${baseSize * 0.9}px;">
+                🔬 Teknologi
+              </button>
+              <button onclick="filterFacts('lingkungan')" 
+                      class="filter-btn px-6 py-3 rounded-full font-semibold"
+                      style="background: ${activeFilter === 'lingkungan' ? `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)` : surfaceColor}; 
+                             color: ${activeFilter === 'lingkungan' ? 'white' : textColor}; 
+                             border: 2px solid ${activeFilter === 'lingkungan' ? 'transparent' : primaryColor};
+                             font-size: ${baseSize * 0.9}px;">
+                🌱 Lingkungan
+              </button>
+              <button onclick="filterFacts('ekonomi')" 
+                      class="filter-btn px-6 py-3 rounded-full font-semibold"
+                      style="background: ${activeFilter === 'ekonomi' ? `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)` : surfaceColor}; 
+                             color: ${activeFilter === 'ekonomi' ? 'white' : textColor}; 
+                             border: 2px solid ${activeFilter === 'ekonomi' ? 'transparent' : primaryColor};
+                             font-size: ${baseSize * 0.9}px;">
+                💰 Ekonomi
+              </button>
+            </div>
+
+            <!-- Facts Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+              ${filteredFacts.map((fact, index) => `
+                <div id="fact-${fact.id}" 
+                     class="fact-card rounded-2xl p-6 cursor-pointer"
+                     onclick="markAsRead(${fact.id})"
+                     style="background: linear-gradient(135deg, ${surfaceColor} 0%, ${bgColor} 100%); 
+                            border: 2px solid ${primaryColor}33;
+                            transition-delay: ${index * 0.1}s;">
+                  <div class="icon-container" 
+                       style="background: linear-gradient(135deg, ${primaryColor}33 0%, ${secondaryColor}33 100%); 
+                              border: 2px solid ${primaryColor};">
+                    ${fact.icon}
+                  </div>
+                  <div class="flex items-center justify-between mb-3">
+                    <span class="px-3 py-1 rounded-full" 
+                          style="background-color: ${primaryColor}; color: ${bgColor}; font-size: ${baseSize * 0.75}px; font-weight: 600;">
+                      #${fact.id}
+                    </span>
+                    <span class="px-3 py-1 rounded-full" 
+                          style="background-color: ${surfaceColor}; color: ${secondaryColor}; font-size: ${baseSize * 0.75}px; font-weight: 600; text-transform: uppercase;">
+                      ${fact.category}
+                    </span>
+                  </div>
+                  <p style="font-size: ${baseSize * 0.95}px; color: ${textColor}; line-height: 1.7;">
+                    ${fact.text}
+                  </p>
+                </div>
+              `).join('')}
+            </div>
+
+            <!-- Infographic Section -->
+            <div class="rounded-2xl p-8 mb-8" style="background-color: ${surfaceColor};">
+              <h2 style="font-size: ${baseSize * 1.8}px; font-weight: 700; color: ${textColor}; margin-bottom: 24px; text-align: center;">
+                ${config.infographic_title || defaultConfig.infographic_title}
+              </h2>
+              <div class="space-y-4 max-w-3xl mx-auto">
+                ${consumptionData.map(item => `
+                  <div>
+                    <div class="flex justify-between mb-2">
+                      <span style="font-size: ${baseSize * 0.95}px; font-weight: 600; color: ${textColor};">
+                        ${item.country}
+                      </span>
+                      <span style="font-size: ${baseSize * 0.95}px; font-weight: 700; color: ${primaryColor};">
+                        ${item.consumption}%
+                      </span>
+                    </div>
+                    <div class="bar-chart" style="width: ${item.consumption * 5}%; background: linear-gradient(90deg, ${item.color} 0%, ${item.color}99 100%);"></div>
+                  </div>
+                `).join('')}
+              </div>
+              <p style="font-size: ${baseSize * 0.85}px; color: ${textColor}; opacity: 0.7; text-align: center; margin-top: 24px;">
+                * Data persentase konsumsi minyak global berdasarkan estimasi 2023
+              </p>
+            </div>
+
+            <!-- Timeline Section -->
+            <div class="rounded-2xl p-8" style="background-color: ${surfaceColor};">
+              <h2 style="font-size: ${baseSize * 1.8}px; font-weight: 700; color: ${textColor}; margin-bottom: 32px; text-align: center;">
+                ${config.timeline_title || defaultConfig.timeline_title}
+              </h2>
+              <div class="max-w-3xl mx-auto">
+                ${timeline.map((item, idx) => `
+                  <div class="timeline-item" style="color: ${idx % 2 === 0 ? primaryColor : secondaryColor};">
+                    <div class="rounded-xl p-5" style="background-color: ${bgColor};">
+                      <div class="flex items-center justify-between mb-3">
+                        <span style="font-size: ${baseSize * 1.5}px; font-weight: 800; color: ${idx % 2 === 0 ? primaryColor : secondaryColor};">
+                          ${item.year}
+                        </span>
+                        <span class="px-3 py-1 rounded-full" 
+                              style="background: linear-gradient(135deg, ${idx % 2 === 0 ? primaryColor : secondaryColor} 0%, ${idx % 2 === 0 ? secondaryColor : primaryColor} 100%); 
+                                     color: white; 
+                                     font-size: ${baseSize * 0.75}px; 
+                                     font-weight: 600;">
+                          Milestone ${idx + 1}
+                        </span>
+                      </div>
+                      <h4 style="font-size: ${baseSize * 1.1}px; font-weight: 700; color: ${textColor}; margin-bottom: 8px;">
+                        ${item.event}
+                      </h4>
+                      <p style="font-size: ${baseSize * 0.9}px; color: ${textColor}; opacity: 0.8; line-height: 1.6;">
+                        ${item.desc}
+                      </p>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function onConfigChange(newConfig) {
+      config = { ...config, ...newConfig };
+      updateUI();
+    }
+
+    function updateUI() {
+      const app = document.getElementById('app');
+      if (app) {
+        app.innerHTML = createApp();
+        setTimeout(() => {
+          observeFactCards();
+          startDidYouKnowRotation();
+        }, 100);
+      }
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [
+          {
+            get: () => config.background_color || defaultConfig.background_color,
+            set: (value) => {
+              config.background_color = value;
+              window.elementSdk.setConfig({ background_color: value });
+            }
+          },
+          {
+            get: () => config.surface_color || defaultConfig.surface_color,
+            set: (value) => {
+              config.surface_color = value;
+              window.elementSdk.setConfig({ surface_color: value });
+            }
+          },
+          {
+            get: () => config.text_color || defaultConfig.text_color,
+            set: (value) => {
+              config.text_color = value;
+              window.elementSdk.setConfig({ text_color: value });
+            }
+          },
+          {
+            get: () => config.primary_action || defaultConfig.primary_action,
+            set: (value) => {
+              config.primary_action = value;
+              window.elementSdk.setConfig({ primary_action: value });
+            }
+          },
+          {
+            get: () => config.secondary_action || defaultConfig.secondary_action,
+            set: (value) => {
+              config.secondary_action = value;
+              window.elementSdk.setConfig({ secondary_action: value });
+            }
+          }
+        ],
+        borderables: [],
+        fontEditable: {
+          get: () => config.font_family || defaultConfig.font_family,
+          set: (value) => {
+            config.font_family = value;
+            window.elementSdk.setConfig({ font_family: value });
+          }
+        },
+        fontSizeable: {
+          get: () => config.font_size || defaultConfig.font_size,
+          set: (value) => {
+            config.font_size = value;
+            window.elementSdk.setConfig({ font_size: value });
+          }
+        }
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ["page_title", config.page_title || defaultConfig.page_title],
+        ["nav_back", config.nav_back || defaultConfig.nav_back],
+        ["main_title", config.main_title || defaultConfig.main_title],
+        ["subtitle", config.subtitle || defaultConfig.subtitle],
+        ["random_button", config.random_button || defaultConfig.random_button],
+        ["reset_button", config.reset_button || defaultConfig.reset_button],
+        ["did_you_know_title", config.did_you_know_title || defaultConfig.did_you_know_title],
+        ["infographic_title", config.infographic_title || defaultConfig.infographic_title],
+        ["timeline_title", config.timeline_title || defaultConfig.timeline_title]
+      ]);
+    }
+
+    async function init() {
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig,
+          onConfigChange,
+          mapToCapabilities,
+          mapToEditPanelValues
+        });
+        
+        config = window.elementSdk.config;
+      }
+      
+      updateUI();
+    }
+
+    window.filterFacts = filterFacts;
+    window.showRandomFact = showRandomFact;
+    window.resetCounter = resetCounter;
+    window.markAsRead = markAsRead;
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a3ed1ff11de051a',t:'MTc2NDA0OTMyMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

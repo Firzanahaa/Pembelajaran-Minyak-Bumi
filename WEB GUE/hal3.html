@@ -1,0 +1,770 @@
+<!doctype html>
+<html lang="id">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulasi Menara Destilasi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    
+    * {
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .tower-level {
+      position: relative;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      overflow: hidden;
+    }
+    
+    .tower-level:hover {
+      transform: translateX(-8px);
+      box-shadow: 0 0 30px rgba(20, 184, 166, 0.5);
+      border-color: #14b8a6;
+    }
+    
+    .tower-level.active {
+      transform: translateX(-8px);
+      box-shadow: 0 0 40px rgba(20, 184, 166, 0.8);
+      border-color: #14b8a6;
+      border-width: 3px;
+    }
+    
+    .bubble {
+      position: absolute;
+      bottom: -20px;
+      width: 10px;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 50%;
+      animation: rise 3s infinite ease-in;
+    }
+    
+    @keyframes rise {
+      0% {
+        bottom: -20px;
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        bottom: 100%;
+        opacity: 0;
+      }
+    }
+    
+    .flow-animation {
+      position: absolute;
+      width: 4px;
+      height: 20px;
+      background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+      animation: flow 2s infinite ease-in-out;
+    }
+    
+    @keyframes flow {
+      0% {
+        top: -20px;
+        opacity: 0;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        top: 100%;
+        opacity: 0;
+      }
+    }
+    
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.5;
+      }
+    }
+    
+    .slide-in {
+      animation: slideIn 0.5s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    .temp-indicator {
+      position: absolute;
+      right: -40px;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid;
+    }
+    
+    .product-pipe {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      width: 40px;
+      height: 3px;
+      background: currentColor;
+      transform: translateY(-50%);
+    }
+    
+    .product-pipe::after {
+      content: '▶';
+      position: absolute;
+      right: -15px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+    }
+    
+    .control-btn {
+      transition: all 0.3s ease;
+    }
+    
+    .control-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    .control-btn:active {
+      transform: translateY(0);
+    }
+    
+    .slider-container input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      outline: none;
+    }
+    
+    .slider-container input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .slider-container input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+    
+    @media (max-width: 768px) {
+      .tower-level {
+        margin-right: 0 !important;
+      }
+      
+      .temp-indicator {
+        right: 8px;
+        top: 8px;
+        transform: none;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="min-h-full">
+  <div id="app" class="w-full min-h-full"></div>
+  <script>
+    const defaultConfig = {
+      page_title: "Simulasi Menara Destilasi",
+      nav_back: "← Kembali ke Beranda",
+      start_button: "Mulai Simulasi",
+      stop_button: "Stop",
+      reset_button: "Reset",
+      info_title: "Detail Fraksi",
+      click_prompt: "Klik pada tingkat menara untuk melihat detail produk yang dihasilkan di setiap tingkat",
+      principle_title: "Prinsip Kerja Destilasi Bertingkat",
+      background_color: "#0f172a",
+      surface_color: "#1e293b",
+      text_color: "#f1f5f9",
+      primary_action: "#14b8a6",
+      secondary_action: "#0e7490",
+      font_family: "Poppins",
+      font_size: 16
+    };
+
+    let config = { ...defaultConfig };
+
+    const fractionData = [
+      {
+        id: 1,
+        name: "Gas Petroleum (LPG)",
+        carbon: "C1-C4",
+        temp: "<40°C",
+        boilingPoint: "-164°C hingga 0°C",
+        color: "#3b82f6",
+        usage: "Bahan bakar kompor gas, pemantik api, bahan baku industri kimia",
+        examples: "Propana, Butana, Metana, Etana",
+        icon: "🔥",
+        gradient: "linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%)"
+      },
+      {
+        id: 2,
+        name: "Bensin (Gasoline)",
+        carbon: "C5-C12",
+        temp: "40-200°C",
+        boilingPoint: "30°C hingga 200°C",
+        color: "#10b981",
+        usage: "Bahan bakar kendaraan bermotor, sepeda motor, mesin bensin",
+        examples: "Premium, Pertalite, Pertamax, Oktan 88-98",
+        icon: "⛽",
+        gradient: "linear-gradient(135deg, #10b981 0%, #34d399 100%)"
+      },
+      {
+        id: 3,
+        name: "Kerosin",
+        carbon: "C12-C16",
+        temp: "150-250°C",
+        boilingPoint: "150°C hingga 275°C",
+        color: "#f59e0b",
+        usage: "Bahan bakar pesawat jet, lampu minyak tanah, pemanas ruangan",
+        examples: "Avtur (Aviation Turbine), Minyak Tanah",
+        icon: "✈️",
+        gradient: "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)"
+      },
+      {
+        id: 4,
+        name: "Solar (Diesel)",
+        carbon: "C15-C18",
+        temp: "250-350°C",
+        boilingPoint: "250°C hingga 350°C",
+        color: "#f97316",
+        usage: "Bahan bakar mesin diesel, truk, bus, kapal kecil, generator",
+        examples: "Solar, Bio Solar, Dexlite, Pertamina Dex",
+        icon: "🚚",
+        gradient: "linear-gradient(135deg, #f97316 0%, #fb923c 100%)"
+      },
+      {
+        id: 5,
+        name: "Minyak Pelumas (Oli)",
+        carbon: "C20-C30",
+        temp: "300-400°C",
+        boilingPoint: "300°C hingga 400°C",
+        color: "#dc2626",
+        usage: "Pelumas mesin, oli motor, oli industri, minyak hidrolik",
+        examples: "Oli SAE 10W-40, Oli Transmisi, Pelumas Industri",
+        icon: "🛢️",
+        gradient: "linear-gradient(135deg, #dc2626 0%, #ef4444 100%)"
+      },
+      {
+        id: 6,
+        name: "Residu (Aspal/Bitumen)",
+        carbon: ">C30",
+        temp: ">400°C",
+        boilingPoint: ">400°C",
+        color: "#7c2d12",
+        usage: "Aspal jalan raya, bahan bakar kapal (bunker fuel), bahan waterproofing",
+        examples: "Aspal Jalan, Bitumen, Residu Atmosferik",
+        icon: "🛣️",
+        gradient: "linear-gradient(135deg, #7c2d12 0%, #9a3412 100%)"
+      }
+    ];
+
+    let isRunning = false;
+    let selectedLevel = null;
+    let speed = 1;
+    let showLabels = true;
+    let temperature = 400;
+
+    function toggleSimulation() {
+      isRunning = !isRunning;
+      updateUI();
+    }
+
+    function resetSimulation() {
+      isRunning = false;
+      selectedLevel = null;
+      speed = 1;
+      temperature = 400;
+      document.getElementById('speed-slider').value = 1;
+      document.getElementById('temp-slider').value = 400;
+      updateUI();
+    }
+
+    function selectLevel(levelId) {
+      selectedLevel = levelId;
+      updateUI();
+    }
+
+    function updateSpeed(value) {
+      speed = parseFloat(value);
+      updateUI();
+    }
+
+    function updateTemperature(value) {
+      temperature = parseInt(value);
+      updateUI();
+    }
+
+    function toggleLabels() {
+      showLabels = !showLabels;
+      updateUI();
+    }
+
+    function createBubbles() {
+      if (!isRunning) return '';
+      
+      let bubbles = '';
+      for (let i = 0; i < 5; i++) {
+        const left = 20 + Math.random() * 60;
+        const delay = Math.random() * 2;
+        const duration = 2 + Math.random() * 2;
+        bubbles += `<div class="bubble" style="left: ${left}%; animation-delay: ${delay}s; animation-duration: ${duration / speed}s;"></div>`;
+      }
+      return bubbles;
+    }
+
+    function createFlowAnimation() {
+      if (!isRunning) return '';
+      
+      let flows = '';
+      for (let i = 0; i < 3; i++) {
+        const left = 30 + Math.random() * 40;
+        const delay = Math.random() * 1.5;
+        flows += `<div class="flow-animation" style="left: ${left}%; animation-delay: ${delay}s; animation-duration: ${2 / speed}s;"></div>`;
+      }
+      return flows;
+    }
+
+    function createApp() {
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const bgColor = config.background_color || defaultConfig.background_color;
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_action || defaultConfig.primary_action;
+      const secondaryColor = config.secondary_action || defaultConfig.secondary_action;
+
+      const selectedFraction = selectedLevel ? fractionData.find(f => f.id === selectedLevel) : null;
+
+      return `
+        <div class="w-full min-h-full" style="background-color: ${bgColor}; color: ${textColor}; font-family: '${customFont}', sans-serif;">
+          <!-- Header -->
+          <header class="w-full sticky top-0 z-40" style="background-color: ${surfaceColor}; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+              <button onclick="window.history.back()" 
+                      class="hover:opacity-80 transition-opacity"
+                      style="color: ${primaryColor}; font-size: ${baseSize * 0.9}px;">
+                ${config.nav_back || defaultConfig.nav_back}
+              </button>
+              <h1 style="font-size: ${baseSize * 1.25}px; font-weight: 700; color: ${textColor};">
+                ${config.page_title || defaultConfig.page_title}
+              </h1>
+              <div style="width: 120px;"></div>
+            </div>
+          </header>
+
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <!-- Control Panel -->
+              <div class="lg:col-span-1 space-y-6">
+                <div class="rounded-2xl p-6" style="background-color: ${surfaceColor};">
+                  <h2 style="font-size: ${baseSize * 1.3}px; font-weight: 600; color: ${textColor}; margin-bottom: 20px;">
+                    🎮 Panel Kontrol
+                  </h2>
+                  
+                  <div class="space-y-4">
+                    <!-- Control Buttons -->
+                    <div class="flex gap-3">
+                      <button onclick="toggleSimulation()" 
+                              class="control-btn flex-1 py-3 rounded-lg font-semibold"
+                              style="background: ${isRunning ? '#dc2626' : primaryColor}; color: white; font-size: ${baseSize * 0.9}px;">
+                        ${isRunning ? (config.stop_button || defaultConfig.stop_button) : (config.start_button || defaultConfig.start_button)}
+                      </button>
+                      <button onclick="resetSimulation()" 
+                              class="control-btn px-4 py-3 rounded-lg font-semibold"
+                              style="background-color: ${surfaceColor}; border: 2px solid ${secondaryColor}; color: ${secondaryColor}; font-size: ${baseSize * 0.9}px;">
+                        ${config.reset_button || defaultConfig.reset_button}
+                      </button>
+                    </div>
+
+                    <!-- Speed Control -->
+                    <div class="slider-container">
+                      <label style="font-size: ${baseSize * 0.9}px; color: ${textColor}; display: block; margin-bottom: 8px;">
+                        ⚡ Kecepatan Animasi: <strong>${speed}x</strong>
+                      </label>
+                      <input type="range" id="speed-slider" min="0.5" max="3" step="0.5" value="${speed}" 
+                             oninput="updateSpeed(this.value)"
+                             style="background: ${secondaryColor};">
+                      <div class="flex justify-between mt-2" style="font-size: ${baseSize * 0.75}px; color: ${textColor}; opacity: 0.7;">
+                        <span>0.5x</span>
+                        <span>1.5x</span>
+                        <span>3x</span>
+                      </div>
+                    </div>
+
+                    <!-- Temperature Control -->
+                    <div class="slider-container">
+                      <label style="font-size: ${baseSize * 0.9}px; color: ${textColor}; display: block; margin-bottom: 8px;">
+                        🌡️ Suhu Menara: <strong>${temperature}°C</strong>
+                      </label>
+                      <input type="range" id="temp-slider" min="0" max="500" step="10" value="${temperature}" 
+                             oninput="updateTemperature(this.value)"
+                             style="background: linear-gradient(90deg, #3b82f6 0%, #ef4444 100%);">
+                      <div class="flex justify-between mt-2" style="font-size: ${baseSize * 0.75}px; color: ${textColor}; opacity: 0.7;">
+                        <span>0°C</span>
+                        <span>250°C</span>
+                        <span>500°C</span>
+                      </div>
+                    </div>
+
+                    <!-- Show Labels Toggle -->
+                    <div class="flex items-center justify-between p-3 rounded-lg" style="background-color: ${bgColor};">
+                      <label style="font-size: ${baseSize * 0.9}px; color: ${textColor};">
+                        🏷️ Tampilkan Label
+                      </label>
+                      <label class="relative inline-block w-12 h-6">
+                        <input type="checkbox" ${showLabels ? 'checked' : ''} onchange="toggleLabels()" class="opacity-0 w-0 h-0">
+                        <span class="absolute cursor-pointer inset-0 rounded-full transition-all"
+                              style="background-color: ${showLabels ? primaryColor : '#64748b'};">
+                          <span class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-all"
+                                style="transform: translateX(${showLabels ? '24px' : '0'});"></span>
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Info Panel -->
+                <div class="rounded-2xl p-6 ${selectedFraction ? 'slide-in' : ''}" 
+                     style="background-color: ${surfaceColor}; min-height: 300px;">
+                  <h2 style="font-size: ${baseSize * 1.3}px; font-weight: 600; color: ${textColor}; margin-bottom: 20px;">
+                    📋 ${config.info_title || defaultConfig.info_title}
+                  </h2>
+                  
+                  ${selectedFraction ? `
+                    <div class="space-y-4">
+                      <div class="flex items-center space-x-3 p-4 rounded-lg" 
+                           style="background: ${selectedFraction.gradient};">
+                        <span style="font-size: ${baseSize * 2.5}px;">${selectedFraction.icon}</span>
+                        <div>
+                          <h3 style="font-size: ${baseSize * 1.2}px; font-weight: 700; color: white;">
+                            ${selectedFraction.name}
+                          </h3>
+                          <p style="font-size: ${baseSize * 0.85}px; color: white; opacity: 0.9;">
+                            ${selectedFraction.carbon}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="space-y-3">
+                        <div class="p-3 rounded-lg" style="background-color: ${bgColor};">
+                          <div style="font-size: ${baseSize * 0.8}px; color: ${textColor}; opacity: 0.7; margin-bottom: 4px;">
+                            Suhu Pengembunan
+                          </div>
+                          <div style="font-size: ${baseSize * 1.1}px; font-weight: 600; color: ${primaryColor};">
+                            ${selectedFraction.temp}
+                          </div>
+                        </div>
+
+                        <div class="p-3 rounded-lg" style="background-color: ${bgColor};">
+                          <div style="font-size: ${baseSize * 0.8}px; color: ${textColor}; opacity: 0.7; margin-bottom: 4px;">
+                            Titik Didih
+                          </div>
+                          <div style="font-size: ${baseSize * 1.1}px; font-weight: 600; color: ${primaryColor};">
+                            ${selectedFraction.boilingPoint}
+                          </div>
+                        </div>
+
+                        <div class="p-3 rounded-lg" style="background-color: ${bgColor};">
+                          <div style="font-size: ${baseSize * 0.8}px; color: ${textColor}; opacity: 0.7; margin-bottom: 8px;">
+                            Kegunaan
+                          </div>
+                          <div style="font-size: ${baseSize * 0.9}px; color: ${textColor}; line-height: 1.6;">
+                            ${selectedFraction.usage}
+                          </div>
+                        </div>
+
+                        <div class="p-3 rounded-lg" style="background-color: ${bgColor};">
+                          <div style="font-size: ${baseSize * 0.8}px; color: ${textColor}; opacity: 0.7; margin-bottom: 8px;">
+                            Contoh Produk
+                          </div>
+                          <div style="font-size: ${baseSize * 0.9}px; color: ${textColor}; line-height: 1.6;">
+                            ${selectedFraction.examples}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ` : `
+                    <div class="flex flex-col items-center justify-center" style="min-height: 250px;">
+                      <div style="font-size: ${baseSize * 3}px; margin-bottom: 16px; opacity: 0.3;">
+                        👆
+                      </div>
+                      <p style="font-size: ${baseSize * 0.95}px; color: ${textColor}; opacity: 0.7; text-align: center; line-height: 1.6;">
+                        ${config.click_prompt || defaultConfig.click_prompt}
+                      </p>
+                    </div>
+                  `}
+                </div>
+              </div>
+
+              <!-- Tower Simulation -->
+              <div class="lg:col-span-2">
+                <div class="rounded-2xl p-8" style="background-color: ${surfaceColor};">
+                  <h2 style="font-size: ${baseSize * 1.3}px; font-weight: 600; color: ${textColor}; margin-bottom: 24px; text-align: center;">
+                    🏭 Menara Destilasi Bertingkat
+                  </h2>
+                  
+                  <div class="relative" style="max-width: 600px; margin: 0 auto;">
+                    <!-- Tower Structure -->
+                    <div class="space-y-2" style="position: relative;">
+                      ${fractionData.map((fraction, index) => `
+                        <div class="tower-level ${selectedLevel === fraction.id ? 'active' : ''}"
+                             onclick="selectLevel(${fraction.id})"
+                             style="background: ${fraction.gradient}; 
+                                    padding: 24px 20px; 
+                                    border-radius: 12px;
+                                    position: relative;
+                                    margin-right: 60px;
+                                    min-height: 80px;">
+                          
+                          ${isRunning ? createBubbles() : ''}
+                          ${isRunning ? createFlowAnimation() : ''}
+                          
+                          ${showLabels ? `
+                            <div style="position: relative; z-index: 10;">
+                              <div class="flex items-center justify-between">
+                                <div>
+                                  <div class="flex items-center space-x-2 mb-1">
+                                    <span style="font-size: ${baseSize * 1.3}px;">${fraction.icon}</span>
+                                    <span style="font-size: ${baseSize * 1.05}px; font-weight: 600; color: white;">
+                                      ${fraction.name}
+                                    </span>
+                                  </div>
+                                  <div style="font-size: ${baseSize * 0.8}px; color: white; opacity: 0.9;">
+                                    ${fraction.carbon} • ${fraction.temp}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ` : ''}
+                          
+                          <div class="product-pipe ${isRunning ? 'pulse' : ''}" style="color: white;"></div>
+                          
+                          <div class="temp-indicator" style="color: white; border-color: white;">
+                            ${fraction.temp}
+                          </div>
+                        </div>
+                      `).join('')}
+                    </div>
+
+                    <!-- Input Arrow -->
+                    <div class="mt-6 flex flex-col items-center">
+                      <div style="font-size: ${baseSize * 2}px; color: ${primaryColor};" class="${isRunning ? 'pulse' : ''}">
+                        ▲
+                      </div>
+                      <div class="mt-2 px-6 py-3 rounded-lg text-center" style="background-color: ${bgColor};">
+                        <div style="font-size: ${baseSize * 1.1}px; font-weight: 600; color: ${textColor};">
+                          🛢️ Minyak Mentah Mentah
+                        </div>
+                        <div style="font-size: ${baseSize * 0.85}px; color: ${textColor}; opacity: 0.7; margin-top: 4px;">
+                          (Crude Oil - Campuran Hidrokarbon)
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Explanation Section -->
+                <div class="mt-8 rounded-2xl p-6" style="background-color: ${surfaceColor};">
+                  <h2 style="font-size: ${baseSize * 1.3}px; font-weight: 600; color: ${textColor}; margin-bottom: 20px;">
+                    💡 ${config.principle_title || defaultConfig.principle_title}
+                  </h2>
+                  
+                  <div class="space-y-6">
+                    <div class="p-4 rounded-lg" style="background-color: ${bgColor}; border-left: 4px solid ${primaryColor};">
+                      <h3 style="font-size: ${baseSize * 1.1}px; font-weight: 600; color: ${primaryColor}; margin-bottom: 8px;">
+                        1️⃣ Prinsip Perbedaan Titik Didih
+                      </h3>
+                      <p style="font-size: ${baseSize * 0.9}px; color: ${textColor}; opacity: 0.9; line-height: 1.6;">
+                        Destilasi bertingkat memanfaatkan perbedaan <strong>titik didih</strong> antar komponen hidrokarbon. 
+                        Hidrokarbon dengan rantai karbon lebih pendek (lebih ringan) memiliki titik didih lebih rendah, 
+                        sehingga menguap terlebih dahulu dan mengembun di bagian atas menara.
+                      </p>
+                    </div>
+
+                    <div class="p-4 rounded-lg" style="background-color: ${bgColor}; border-left: 4px solid ${secondaryColor};">
+                      <h3 style="font-size: ${baseSize * 1.1}px; font-weight: 600; color: ${secondaryColor}; margin-bottom: 8px;">
+                        2️⃣ Mengapa Fraksi Ringan di Atas?
+                      </h3>
+                      <p style="font-size: ${baseSize * 0.9}px; color: ${textColor}; opacity: 0.9; line-height: 1.6;">
+                        Minyak mentah dipanaskan hingga ~400°C di bagian bawah menara. Uap naik ke atas dan mendingin secara bertahap. 
+                        Komponen dengan titik didih rendah (seperti gas dan bensin) tetap dalam bentuk uap hingga mencapai bagian atas yang lebih dingin. 
+                        Komponen berat (seperti solar dan aspal) mengembun di bagian bawah yang masih panas.
+                      </p>
+                    </div>
+
+                    <div class="p-4 rounded-lg" style="background-color: ${bgColor}; border-left: 4px solid ${primaryColor};">
+                      <h3 style="font-size: ${baseSize * 1.1}px; font-weight: 600; color: ${primaryColor}; margin-bottom: 8px;">
+                        3️⃣ Proses Tambahan: Cracking & Reforming
+                      </h3>
+                      <p style="font-size: ${baseSize * 0.9}px; color: ${textColor}; opacity: 0.9; line-height: 1.6;">
+                        <strong>Cracking:</strong> Memecah molekul besar menjadi molekul lebih kecil (contoh: mengubah minyak berat menjadi bensin).<br>
+                        <strong>Reforming:</strong> Mengubah struktur molekul untuk meningkatkan kualitas (contoh: meningkatkan nilai oktan bensin).
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function onConfigChange(newConfig) {
+      config = { ...config, ...newConfig };
+      updateUI();
+    }
+
+    function updateUI() {
+      const app = document.getElementById('app');
+      if (app) {
+        app.innerHTML = createApp();
+      }
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [
+          {
+            get: () => config.background_color || defaultConfig.background_color,
+            set: (value) => {
+              config.background_color = value;
+              window.elementSdk.setConfig({ background_color: value });
+            }
+          },
+          {
+            get: () => config.surface_color || defaultConfig.surface_color,
+            set: (value) => {
+              config.surface_color = value;
+              window.elementSdk.setConfig({ surface_color: value });
+            }
+          },
+          {
+            get: () => config.text_color || defaultConfig.text_color,
+            set: (value) => {
+              config.text_color = value;
+              window.elementSdk.setConfig({ text_color: value });
+            }
+          },
+          {
+            get: () => config.primary_action || defaultConfig.primary_action,
+            set: (value) => {
+              config.primary_action = value;
+              window.elementSdk.setConfig({ primary_action: value });
+            }
+          },
+          {
+            get: () => config.secondary_action || defaultConfig.secondary_action,
+            set: (value) => {
+              config.secondary_action = value;
+              window.elementSdk.setConfig({ secondary_action: value });
+            }
+          }
+        ],
+        borderables: [],
+        fontEditable: {
+          get: () => config.font_family || defaultConfig.font_family,
+          set: (value) => {
+            config.font_family = value;
+            window.elementSdk.setConfig({ font_family: value });
+          }
+        },
+        fontSizeable: {
+          get: () => config.font_size || defaultConfig.font_size,
+          set: (value) => {
+            config.font_size = value;
+            window.elementSdk.setConfig({ font_size: value });
+          }
+        }
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ["page_title", config.page_title || defaultConfig.page_title],
+        ["nav_back", config.nav_back || defaultConfig.nav_back],
+        ["start_button", config.start_button || defaultConfig.start_button],
+        ["stop_button", config.stop_button || defaultConfig.stop_button],
+        ["reset_button", config.reset_button || defaultConfig.reset_button],
+        ["info_title", config.info_title || defaultConfig.info_title],
+        ["click_prompt", config.click_prompt || defaultConfig.click_prompt],
+        ["principle_title", config.principle_title || defaultConfig.principle_title]
+      ]);
+    }
+
+    async function init() {
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig,
+          onConfigChange,
+          mapToCapabilities,
+          mapToEditPanelValues
+        });
+        
+        config = window.elementSdk.config;
+      }
+      
+      updateUI();
+    }
+
+    // Make functions globally available
+    window.toggleSimulation = toggleSimulation;
+    window.resetSimulation = resetSimulation;
+    window.selectLevel = selectLevel;
+    window.updateSpeed = updateSpeed;
+    window.updateTemperature = updateTemperature;
+    window.toggleLabels = toggleLabels;
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a3eceddd5c1051a',t:'MTc2NDA0OTE5Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

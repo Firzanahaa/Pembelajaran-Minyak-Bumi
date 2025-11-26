@@ -1,0 +1,1321 @@
+<!doctype html>
+<html lang="id">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Materi Pembelajaran Minyak Bumi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    
+    * {
+      font-family: 'Inter', sans-serif;
+    }
+    
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      scroll-behavior: smooth;
+    }
+    
+    .sticky-sidebar {
+      position: sticky;
+      top: 20px;
+      max-height: calc(100% - 40px);
+      overflow-y: auto;
+    }
+    
+    .accordion-section {
+      transition: all 0.3s ease;
+    }
+    
+    .accordion-header {
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .accordion-header:hover {
+      transform: translateX(4px);
+    }
+    
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease;
+    }
+    
+    .accordion-content.expanded {
+      max-height: 10000px;
+    }
+    
+    .nav-item {
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .nav-item:hover {
+      transform: translateX(4px);
+    }
+    
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      left: -16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 4px;
+      height: 100%;
+      border-radius: 2px;
+      background: currentColor;
+    }
+    
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #3b82f6, #10b981);
+      z-index: 100;
+      transition: width 0.3s ease;
+    }
+    
+    .highlight-box {
+      position: relative;
+      padding: 20px;
+      border-radius: 12px;
+      border-left: 4px solid;
+      margin: 20px 0;
+    }
+    
+    .timeline-item {
+      position: relative;
+      padding-left: 40px;
+      padding-bottom: 32px;
+    }
+    
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: 11px;
+      top: 8px;
+      bottom: -8px;
+      width: 2px;
+      background: currentColor;
+      opacity: 0.3;
+    }
+    
+    .timeline-item:last-child::before {
+      display: none;
+    }
+    
+    .timeline-dot {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 12px;
+    }
+    
+    .timeline-content {
+      cursor: pointer;
+      transition: all 0.3s ease;
+      padding: 16px;
+      border-radius: 8px;
+    }
+    
+    .timeline-content:hover {
+      transform: translateX(4px);
+    }
+    
+    .timeline-details {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      margin-top: 8px;
+    }
+    
+    .timeline-details.expanded {
+      max-height: 500px;
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.6s ease;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .molecule-svg {
+      transition: transform 0.3s ease;
+    }
+    
+    .molecule-svg:hover {
+      transform: scale(1.05);
+    }
+    
+    .solution-card {
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .solution-card:hover {
+      transform: translateY(-4px);
+    }
+    
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: rgba(59, 130, 246, 0.5);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(59, 130, 246, 0.8);
+    }
+    
+    @media (max-width: 1024px) {
+      .mobile-nav-dropdown {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+      }
+      
+      .mobile-nav-dropdown.open {
+        max-height: 400px;
+      }
+    }
+    
+    .table-row {
+      transition: background-color 0.2s ease;
+    }
+    
+    .table-row:hover {
+      opacity: 0.9;
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="min-h-full">
+  <div id="progress-bar" class="progress-bar" style="width: 0%"></div>
+  <div id="app" class="w-full min-h-full"></div>
+  <script>
+    const defaultConfig = {
+      page_title: "Materi Pembelajaran Minyak Bumi",
+      page_subtitle: "Kimia SMA Kelas XI - Bab Minyak Bumi",
+      section_1_title: "Penjelasan Minyak Bumi",
+      section_2_title: "Proses Pembentukan",
+      section_3_title: "Hubungan dengan Hidrokarbon",
+      section_4_title: "Isu Terkini Bahan Bakar",
+      section_5_title: "Kelebihan dan Kekurangan",
+      section_6_title: "Solusi Keberlanjutan",
+      next_button: "Lanjut ke Simulasi →",
+      back_button: "← Kembali ke Beranda",
+      background_color: "#0f172a",
+      surface_color: "#1e293b",
+      text_color: "#f1f5f9",
+      primary_action: "#3b82f6",
+      secondary_action: "#10b981",
+      font_family: "Inter",
+      font_size: 16
+    };
+
+    let config = { ...defaultConfig };
+    let expandedSections = new Set([1, 2, 3, 4, 5, 6]);
+    let activeSection = 1;
+    let mobileNavOpen = false;
+    let expandedTimeline = new Set();
+
+    const sections = [
+      {
+        id: 1,
+        configKey: 'section_1_title',
+        icon: '🛢️',
+        color: '#3b82f6'
+      },
+      {
+        id: 2,
+        configKey: 'section_2_title',
+        icon: '🌍',
+        color: '#10b981'
+      },
+      {
+        id: 3,
+        configKey: 'section_3_title',
+        icon: '⚗️',
+        color: '#8b5cf6'
+      },
+      {
+        id: 4,
+        configKey: 'section_4_title',
+        icon: '⚠️',
+        color: '#f59e0b'
+      },
+      {
+        id: 5,
+        configKey: 'section_5_title',
+        icon: '⚖️',
+        color: '#ec4899'
+      },
+      {
+        id: 6,
+        configKey: 'section_6_title',
+        icon: '🌱',
+        color: '#14b8a6'
+      }
+    ];
+
+    function toggleSection(sectionId) {
+      if (expandedSections.has(sectionId)) {
+        expandedSections.delete(sectionId);
+      } else {
+        expandedSections.add(sectionId);
+      }
+      updateUI();
+    }
+
+    function scrollToSection(sectionId) {
+      activeSection = sectionId;
+      mobileNavOpen = false;
+      updateUI();
+      
+      setTimeout(() => {
+        const element = document.getElementById(`section-${sectionId}`);
+        if (element) {
+          const offset = 100;
+          const elementPosition = element.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - offset;
+          
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: 'smooth'
+          });
+        }
+      }, 100);
+    }
+
+    function toggleMobileNav() {
+      mobileNavOpen = !mobileNavOpen;
+      updateUI();
+    }
+
+    function toggleTimeline(index) {
+      if (expandedTimeline.has(index)) {
+        expandedTimeline.delete(index);
+      } else {
+        expandedTimeline.add(index);
+      }
+      updateUI();
+    }
+
+    function updateProgress() {
+      const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      
+      const progressBar = document.getElementById('progress-bar');
+      if (progressBar) {
+        progressBar.style.width = scrolled + '%';
+      }
+
+      const sections = document.querySelectorAll('[id^="section-"]');
+      sections.forEach((section, index) => {
+        const rect = section.getBoundingClientRect();
+        if (rect.top <= 200 && rect.bottom >= 200) {
+          activeSection = index + 1;
+        }
+      });
+    }
+
+    function createMoleculeIllustration() {
+      const primaryColor = config.primary_action || defaultConfig.primary_action;
+      const secondaryColor = config.secondary_action || defaultConfig.secondary_action;
+      
+      return `
+        <svg class="molecule-svg w-full h-48" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+          <!-- Carbon atoms -->
+          <circle cx="40" cy="50" r="8" fill="${primaryColor}"/>
+          <circle cx="70" cy="35" r="8" fill="${primaryColor}"/>
+          <circle cx="70" cy="65" r="8" fill="${primaryColor}"/>
+          <circle cx="100" cy="50" r="8" fill="${primaryColor}"/>
+          <circle cx="130" cy="35" r="8" fill="${primaryColor}"/>
+          <circle cx="130" cy="65" r="8" fill="${primaryColor}"/>
+          <circle cx="160" cy="50" r="8" fill="${primaryColor}"/>
+          
+          <!-- Bonds -->
+          <line x1="40" y1="50" x2="70" y2="35" stroke="${secondaryColor}" stroke-width="2"/>
+          <line x1="40" y1="50" x2="70" y2="65" stroke="${secondaryColor}" stroke-width="2"/>
+          <line x1="70" y1="35" x2="100" y2="50" stroke="${secondaryColor}" stroke-width="2"/>
+          <line x1="70" y1="65" x2="100" y2="50" stroke="${secondaryColor}" stroke-width="2"/>
+          <line x1="100" y1="50" x2="130" y2="35" stroke="${secondaryColor}" stroke-width="2"/>
+          <line x1="100" y1="50" x2="130" y2="65" stroke="${secondaryColor}" stroke-width="2"/>
+          <line x1="130" y1="35" x2="160" y2="50" stroke="${secondaryColor}" stroke-width="2"/>
+          <line x1="130" y1="65" x2="160" y2="50" stroke="${secondaryColor}" stroke-width="2"/>
+          
+          <!-- Hydrogen atoms (smaller) -->
+          <circle cx="25" cy="35" r="5" fill="${secondaryColor}" opacity="0.7"/>
+          <circle cx="25" cy="65" r="5" fill="${secondaryColor}" opacity="0.7"/>
+          <circle cx="70" cy="20" r="5" fill="${secondaryColor}" opacity="0.7"/>
+          <circle cx="70" cy="80" r="5" fill="${secondaryColor}" opacity="0.7"/>
+          <circle cx="130" cy="20" r="5" fill="${secondaryColor}" opacity="0.7"/>
+          <circle cx="130" cy="80" r="5" fill="${secondaryColor}" opacity="0.7"/>
+          <circle cx="175" cy="35" r="5" fill="${secondaryColor}" opacity="0.7"/>
+          <circle cx="175" cy="65" r="5" fill="${secondaryColor}" opacity="0.7"/>
+          
+          <!-- Labels -->
+          <text x="40" y="55" fill="white" font-size="6" text-anchor="middle" font-weight="bold">C</text>
+          <text x="70" y="40" fill="white" font-size="6" text-anchor="middle" font-weight="bold">C</text>
+          <text x="70" y="70" fill="white" font-size="6" text-anchor="middle" font-weight="bold">C</text>
+          <text x="100" y="55" fill="white" font-size="6" text-anchor="middle" font-weight="bold">C</text>
+          <text x="130" y="40" fill="white" font-size="6" text-anchor="middle" font-weight="bold">C</text>
+          <text x="130" y="70" fill="white" font-size="6" text-anchor="middle" font-weight="bold">C</text>
+          <text x="160" y="55" fill="white" font-size="6" text-anchor="middle" font-weight="bold">C</text>
+          
+          <text x="25" y="37" fill="white" font-size="4" text-anchor="middle">H</text>
+          <text x="25" y="67" fill="white" font-size="4" text-anchor="middle">H</text>
+          <text x="175" y="37" fill="white" font-size="4" text-anchor="middle">H</text>
+          <text x="175" y="67" fill="white" font-size="4" text-anchor="middle">H</text>
+        </svg>
+      `;
+    }
+
+    function createFormationDiagram() {
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_action || defaultConfig.primary_action;
+      const secondaryColor = config.secondary_action || defaultConfig.secondary_action;
+      
+      return `
+        <svg class="w-full h-64" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+          <!-- Sea level -->
+          <rect x="0" y="40" width="300" height="30" fill="${primaryColor}" opacity="0.3"/>
+          <text x="150" y="60" fill="${textColor}" font-size="8" text-anchor="middle" font-weight="600">Permukaan Laut</text>
+          
+          <!-- Organisms -->
+          <circle cx="80" cy="55" r="3" fill="${secondaryColor}"/>
+          <circle cx="120" cy="58" r="3" fill="${secondaryColor}"/>
+          <circle cx="180" cy="56" r="3" fill="${secondaryColor}"/>
+          <circle cx="220" cy="57" r="3" fill="${secondaryColor}"/>
+          <text x="150" y="85" fill="${textColor}" font-size="7" text-anchor="middle">Organisme Laut Mati ↓</text>
+          
+          <!-- Sediment layers -->
+          <rect x="0" y="100" width="300" height="20" fill="#8b5cf6" opacity="0.4"/>
+          <rect x="0" y="120" width="300" height="25" fill="#ec4899" opacity="0.4"/>
+          <rect x="0" y="145" width="300" height="30" fill="#f59e0b" opacity="0.4"/>
+          <rect x="0" y="175" width="300" height="25" fill="#10b981" opacity="0.5"/>
+          
+          <!-- Labels -->
+          <text x="10" y="113" fill="${textColor}" font-size="6" font-weight="600">Sedimen Baru</text>
+          <text x="10" y="133" fill="${textColor}" font-size="6" font-weight="600">Lapisan Sedimen</text>
+          <text x="10" y="160" fill="${textColor}" font-size="6" font-weight="600">Material Organik</text>
+          <text x="10" y="190" fill="${textColor}" font-size="6" font-weight="600">Minyak Bumi 🛢️</text>
+          
+          <!-- Arrows -->
+          <path d="M 150 70 L 150 95" stroke="${primaryColor}" stroke-width="2" marker-end="url(#arrowhead)"/>
+          <path d="M 150 145 L 150 170" stroke="${secondaryColor}" stroke-width="2" marker-end="url(#arrowhead2)"/>
+          
+          <defs>
+            <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="5" refY="3" orient="auto">
+              <polygon points="0 0, 5 3, 0 6" fill="${primaryColor}"/>
+            </marker>
+            <marker id="arrowhead2" markerWidth="10" markerHeight="10" refX="5" refY="3" orient="auto">
+              <polygon points="0 0, 5 3, 0 6" fill="${secondaryColor}"/>
+            </marker>
+          </defs>
+          
+          <!-- Time indicator -->
+          <text x="260" y="110" fill="${textColor}" font-size="8" font-weight="700" opacity="0.7">Jutaan</text>
+          <text x="260" y="120" fill="${textColor}" font-size="8" font-weight="700" opacity="0.7">Tahun</text>
+        </svg>
+      `;
+    }
+
+    function createSection1() {
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_action || defaultConfig.primary_action;
+      
+      return `
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          ${[
+            {
+              title: 'Definisi',
+              icon: '📚',
+              content: 'Minyak bumi adalah campuran kompleks dari berbagai senyawa hidrokarbon yang terbentuk dari fosil organisme laut yang telah mati jutaan tahun yang lalu. Komponen utamanya adalah alkana, sikloalkana, dan senyawa aromatik.'
+            },
+            {
+              title: 'Komposisi Kimia',
+              icon: '⚛️',
+              content: 'Terdiri dari 83-87% karbon (C) dan 10-14% hidrogen (H), serta sedikit sulfur (S), nitrogen (N), oksigen (O), dan logam seperti besi, nikel, dan vanadium. Rasio C:H menentukan kualitas minyak.'
+            },
+            {
+              title: 'Karakteristik Fisik',
+              icon: '🔬',
+              content: 'Wujud cair hingga semi-padat pada suhu ruang, berwarna hitam hingga coklat gelap, memiliki bau khas menyengat, densitas 0.8-0.95 g/cm³, tidak larut dalam air (non-polar), dan mudah terbakar dengan energi pembakaran tinggi.'
+            }
+          ].map(card => `
+            <div class="rounded-xl p-6 fade-in" style="background-color: ${surfaceColor}; border: 2px solid ${primaryColor}33;">
+              <div style="font-size: ${baseSize * 2.5}px; margin-bottom: 12px;">${card.icon}</div>
+              <h3 style="font-size: ${baseSize * 1.2}px; font-weight: 700; color: ${primaryColor}; margin-bottom: 12px;">
+                ${card.title}
+              </h3>
+              <p style="font-size: ${baseSize * 0.9}px; color: ${textColor}; opacity: 0.9; line-height: 1.7;">
+                ${card.content}
+              </p>
+            </div>
+          `).join('')}
+        </div>
+        
+        <div class="rounded-xl p-6" style="background-color: ${surfaceColor};">
+          <h3 style="font-size: ${baseSize * 1.3}px; font-weight: 700; color: ${textColor}; margin-bottom: 16px;">
+            🧬 Struktur Molekul Hidrokarbon
+          </h3>
+          ${createMoleculeIllustration()}
+          <p style="font-size: ${baseSize * 0.85}px; color: ${textColor}; opacity: 0.7; text-align: center; margin-top: 12px;">
+            Contoh struktur molekul hidrokarbon dalam minyak bumi (C = Karbon, H = Hidrogen)
+          </p>
+        </div>
+      `;
+    }
+
+    function createSection2() {
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_action || defaultConfig.primary_action;
+      const secondaryColor = config.secondary_action || defaultConfig.secondary_action;
+      
+      const timelineData = [
+        {
+          phase: 'Diagenesis',
+          temp: '< 50°C',
+          desc: 'Dekomposisi biologis dan kimia awal oleh bakteri anaerobik. Organisme mati tertimbun sedimen dan mengalami perubahan biokimia.',
+          detail: 'Proses ini terjadi pada kedalaman dangkal (0-1 km) dengan tekanan rendah. Bakteri menguraikan protein, karbohidrat, dan lemak menjadi kerogen (prekursor minyak).'
+        },
+        {
+          phase: 'Katagenesis',
+          temp: '50-150°C',
+          desc: 'Transformasi termal kerogen menjadi hidrokarbon cair (minyak) dan gas. Ini adalah fase utama pembentukan minyak bumi.',
+          detail: 'Terjadi pada kedalaman 1-4 km dengan tekanan tinggi. Ikatan kimia kerogen terputus membentuk molekul hidrokarbon dengan berbagai panjang rantai. Suhu optimal: 60-120°C (oil window).'
+        },
+        {
+          phase: 'Metagenesis',
+          temp: '> 150°C',
+          desc: 'Cracking termal lanjutan yang mengubah minyak menjadi gas alam (metana). Fase ini terjadi pada suhu sangat tinggi.',
+          detail: 'Kedalaman > 4 km dengan tekanan dan suhu ekstrim. Rantai hidrokarbon panjang pecah menjadi molekul lebih kecil, dominan metana (CH₄). Minyak yang tersisa menjadi aspal atau bitumen.'
+        }
+      ];
+      
+      return `
+        <div class="rounded-xl p-6 mb-8" style="background-color: ${surfaceColor};">
+          <h3 style="font-size: ${baseSize * 1.3}px; font-weight: 700; color: ${textColor}; margin-bottom: 16px;">
+            🌊 Diagram Alur Pembentukan
+          </h3>
+          ${createFormationDiagram()}
+        </div>
+        
+        <div class="highlight-box mb-8" style="background-color: ${primaryColor}15; border-color: ${primaryColor};">
+          <div style="font-size: ${baseSize}px; font-weight: 600; color: ${primaryColor}; margin-bottom: 8px;">
+            ⏱️ Waktu Pembentukan
+          </div>
+          <p style="font-size: ${baseSize * 0.95}px; color: ${textColor}; line-height: 1.7;">
+            Proses pembentukan minyak bumi memakan waktu <strong>10-600 juta tahun</strong>. Sebagian besar cadangan minyak yang kita gunakan saat ini terbentuk pada periode <strong>Mesozoikum (252-66 juta tahun lalu)</strong>, terutama saat Era Jurassic dan Cretaceous ketika lautan dipenuhi plankton dan organisme laut.
+          </p>
+        </div>
+        
+        <div class="rounded-xl p-6" style="background-color: ${surfaceColor};">
+          <h3 style="font-size: ${baseSize * 1.3}px; font-weight: 700; color: ${textColor}; margin-bottom: 20px;">
+            ⏳ Timeline Interaktif - Tahapan Pembentukan
+          </h3>
+          <p style="font-size: ${baseSize * 0.85}px; color: ${textColor}; opacity: 0.7; margin-bottom: 20px;">
+            Klik setiap tahapan untuk melihat detail proses
+          </p>
+          
+          ${timelineData.map((item, index) => `
+            <div class="timeline-item" style="color: ${index === 0 ? primaryColor : index === 1 ? secondaryColor : '#f59e0b'};">
+              <div class="timeline-dot" style="background-color: ${index === 0 ? primaryColor : index === 1 ? secondaryColor : '#f59e0b'}; color: white;">
+                ${index + 1}
+              </div>
+              <div class="timeline-content" 
+                   onclick="toggleTimeline(${index})"
+                   style="background-color: ${(index === 0 ? primaryColor : index === 1 ? secondaryColor : '#f59e0b') + '15'};">
+                <div style="font-size: ${baseSize * 1.1}px; font-weight: 700; color: ${textColor}; margin-bottom: 4px;">
+                  ${item.phase}
+                </div>
+                <div style="font-size: ${baseSize * 0.85}px; font-weight: 600; color: ${index === 0 ? primaryColor : index === 1 ? secondaryColor : '#f59e0b'}; margin-bottom: 8px;">
+                  🌡️ Suhu: ${item.temp}
+                </div>
+                <p style="font-size: ${baseSize * 0.9}px; color: ${textColor}; opacity: 0.9; line-height: 1.6;">
+                  ${item.desc}
+                </p>
+                <div class="timeline-details ${expandedTimeline.has(index) ? 'expanded' : ''}" 
+                     style="background-color: ${surfaceColor}; padding: 12px; border-radius: 8px; margin-top: 8px;">
+                  <p style="font-size: ${baseSize * 0.85}px; color: ${textColor}; opacity: 0.8; line-height: 1.7;">
+                    ${item.detail}
+                  </p>
+                </div>
+                <div style="font-size: ${baseSize * 0.75}px; color: ${index === 0 ? primaryColor : index === 1 ? secondaryColor : '#f59e0b'}; margin-top: 8px; font-weight: 600;">
+                  ${expandedTimeline.has(index) ? '▲ Tutup Detail' : '▼ Lihat Detail'}
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function createSection3() {
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_action || defaultConfig.primary_action;
+      const secondaryColor = config.secondary_action || defaultConfig.secondary_action;
+      
+      const hydrocarbonData = [
+        {
+          name: 'Alkana (Parafin)',
+          formula: 'CₙH₂ₙ₊₂',
+          bond: 'Ikatan tunggal (jenuh)',
+          examples: 'Metana (CH₄), Etana (C₂H₆), Propana (C₃H₈), Butana (C₄H₁₀)',
+          properties: 'Stabil, reaktivitas rendah, titik didih meningkat dengan panjang rantai',
+          color: primaryColor
+        },
+        {
+          name: 'Alkena (Olefin)',
+          formula: 'CₙH₂ₙ',
+          bond: 'Ikatan rangkap dua (tak jenuh)',
+          examples: 'Etena/Etilena (C₂H₄), Propena (C₃H₆)',
+          properties: 'Lebih reaktif dari alkana, digunakan untuk plastik dan polimer',
+          color: secondaryColor
+        },
+        {
+          name: 'Alkuna',
+          formula: 'CₙH₂ₙ₋₂',
+          bond: 'Ikatan rangkap tiga (tak jenuh)',
+          examples: 'Etuna/Asetilena (C₂H₂), Propuna (C₃H₄)',
+          properties: 'Sangat reaktif, digunakan dalam pengelasan (las karbit)',
+          color: '#8b5cf6'
+        },
+        {
+          name: 'Sikloalkana',
+          formula: 'CₙH₂ₙ',
+          bond: 'Struktur cincin jenuh',
+          examples: 'Siklopropana (C₃H₆), Sikloheksana (C₆H₁₂)',
+          properties: 'Stabil, komponen penting dalam bensin',
+          color: '#f59e0b'
+        },
+        {
+          name: 'Aromatik',
+          formula: 'Cincin benzena',
+          bond: 'Ikatan rangkap terkonjugasi',
+          examples: 'Benzena (C₆H₆), Toluena (C₇H₈), Naftalena (C₁₀H₈)',
+          properties: 'Sangat stabil (resonansi), bau aromatik, karsinogenik',
+          color: '#ec4899'
+        }
+      ];
+      
+      return `
+        <div class="highlight-box mb-8" style="background-color: ${primaryColor}15; border-color: ${primaryColor};">
+          <div style="font-size: ${baseSize * 1.1}px; font-weight: 700; color: ${primaryColor}; margin-bottom: 12px;">
+            🧪 Hubungan Hidrokarbon dengan Minyak Bumi
+          </div>
+          <p style="font-size: ${baseSize * 0.95}px; color: ${textColor}; line-height: 1.7; margin-bottom: 12px;">
+            Minyak bumi adalah campuran kompleks dari berbagai jenis hidrokarbon. <strong>Hidrokarbon</strong> adalah senyawa organik yang hanya terdiri dari atom karbon (C) dan hidrogen (H). Struktur dan jenis ikatan antara atom-atom ini menentukan sifat fisik dan kimia dari setiap komponen minyak bumi.
+          </p>
+          <p style="font-size: ${baseSize * 0.95}px; color: ${textColor}; line-height: 1.7;">
+            Klasifikasi hidrokarbon berdasarkan <strong>jumlah atom karbon</strong>: C₁-C₄ (gas), C₅-C₁₂ (bensin), C₁₂-C₂₀ (diesel/kerosin), C₂₀+ (oli, lilin, aspal).
+          </p>
+        </div>
+        
+        <div class="space-y-4">
+          ${hydrocarbonData.map(hc => `
+            <div class="rounded-xl p-6 fade-in" 
+                 style="background-color: ${surfaceColor}; border-left: 4px solid ${hc.color};">
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+                <div>
+                  <h3 style="font-size: ${baseSize * 1.2}px; font-weight: 700; color: ${hc.color}; margin-bottom: 4px;">
+                    ${hc.name}
+                  </h3>
+                  <div style="font-size: ${baseSize * 1.1}px; font-weight: 600; color: ${textColor}; opacity: 0.8;">
+                    Rumus: ${hc.formula}
+                  </div>
+                </div>
+                <div class="mt-3 md:mt-0 px-4 py-2 rounded-lg" 
+                     style="background-color: ${hc.color}22; width: fit-content;">
+                  <span style="font-size: ${baseSize * 0.85}px; font-weight: 600; color: ${hc.color};">
+                    ${hc.bond}
+                  </span>
+                </div>
+              </div>
+              
+              <div class="space-y-3">
+                <div>
+                  <div style="font-size: ${baseSize * 0.85}px; font-weight: 600; color: ${textColor}; opacity: 0.7; margin-bottom: 4px;">
+                    📝 Contoh:
+                  </div>
+                  <p style="font-size: ${baseSize * 0.9}px; color: ${textColor}; opacity: 0.9; line-height: 1.6;">
+                    ${hc.examples}
+                  </p>
+                </div>
+                
+                <div>
+                  <div style="font-size: ${baseSize * 0.85}px; font-weight: 600; color: ${textColor}; opacity: 0.7; margin-bottom: 4px;">
+                    ⚡ Sifat & Kegunaan:
+                  </div>
+                  <p style="font-size: ${baseSize * 0.9}px; color: ${textColor}; opacity: 0.9; line-height: 1.6;">
+                    ${hc.properties}
+                  </p>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        
+        <div class="rounded-xl p-6 mt-6" 
+             style="background: linear-gradient(135deg, ${primaryColor}15 0%, ${secondaryColor}15 100%);">
+          <h3 style="font-size: ${baseSize * 1.1}px; font-weight: 700; color: ${textColor}; margin-bottom: 12px;">
+            💡 Fakta Menarik
+          </h3>
+          <ul class="space-y-3">
+            ${[
+              'Alkana adalah komponen terbesar dalam minyak bumi (70-90%)',
+              'Oktana (C₈H₁₈) dalam bensin menentukan "angka oktan" yang mengukur kualitas bahan bakar',
+              'Senyawa aromatik seperti benzena bersifat karsinogenik (penyebab kanker) sehingga kontak langsung harus dihindari',
+              'Semakin panjang rantai karbon, semakin tinggi titik didih dan semakin kental hidrokarbon tersebut'
+            ].map(fact => `
+              <li style="font-size: ${baseSize * 0.9}px; color: ${textColor}; opacity: 0.9; line-height: 1.7; padding-left: 8px;">
+                • ${fact}
+              </li>
+            `).join('')}
+          </ul>
+        </div>
+      `;
+    }
+
+    function createSection4() {
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const warningColor = '#f59e0b';
+      const dangerColor = '#ef4444';
+      
+      const issues = [
+        {
+          title: 'Pemanasan Global',
+          icon: '🌡️',
+          severity: 'Kritis',
+          color: dangerColor,
+          desc: 'Pembakaran bahan bakar fosil melepaskan CO₂ ke atmosfer, menyebabkan efek rumah kaca dan meningkatkan suhu bumi rata-rata 1.1°C sejak era pra-industri.',
+          impact: 'Pencairan es kutub, kenaikan permukaan laut, cuaca ekstrem, kekeringan, banjir, dan ancaman kepunahan spesies.',
+          data: 'Emisi global: ~36 miliar ton CO₂/tahun dari bahan bakar fosil'
+        },
+        {
+          title: 'Pencemaran Lingkungan',
+          icon: '🏭',
+          severity: 'Tinggi',
+          color: warningColor,
+          desc: 'Tumpahan minyak di laut merusak ekosistem, membunuh kehidupan laut, dan mencemari pantai. Emisi kendaraan menghasilkan polutan udara berbahaya.',
+          impact: 'Kerusakan terumbu karang, kematian ikan dan burung laut, polusi udara (PM2.5, NOx, SOx), penyakit pernapasan pada manusia.',
+          data: 'Deepwater Horizon (2010): 780 juta liter minyak tumpah, kerugian ekologis masif'
+        },
+        {
+          title: 'Krisis Energi',
+          icon: '⚡',
+          severity: 'Tinggi',
+          color: warningColor,
+          desc: 'Minyak bumi adalah sumber daya tidak terbarukan yang akan habis. Cadangan dunia diperkirakan cukup untuk 50 tahun lagi dengan konsumsi saat ini.',
+          impact: 'Ketidakstabilan harga, ketergantungan impor, risiko ekonomi, konflik geopolitik memperebutkan sumber daya.',
+          data: 'Konsumsi global: ~100 juta barel/hari. Cadangan terbukti: ~1.7 triliun barel'
+        },
+        {
+          title: 'Dampak Kesehatan',
+          icon: '🏥',
+          severity: 'Tinggi',
+          color: dangerColor,
+          desc: 'Polusi udara dari kendaraan dan industri menyebabkan penyakit pernapasan, kardiovaskular, dan kanker. WHO memperkirakan 7 juta kematian prematur/tahun.',
+          impact: 'Asma, bronkitis, kanker paru-paru, penyakit jantung, stroke, gangguan perkembangan anak, penurunan harapan hidup.',
+          data: 'Polusi udara adalah pembunuh lingkungan #1 di dunia'
+        }
+      ];
+      
+      return `
+        <div class="grid md:grid-cols-2 gap-6">
+          ${issues.map(issue => `
+            <div class="rounded-xl p-6 fade-in" 
+                 style="background-color: ${surfaceColor}; border: 2px solid ${issue.color};">
+              <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                  <div style="font-size: ${baseSize * 2.5}px;">${issue.icon}</div>
+                  <div>
+                    <h3 style="font-size: ${baseSize * 1.2}px; font-weight: 700; color: ${textColor}; margin-bottom: 4px;">
+                      ${issue.title}
+                    </h3>
+                    <div class="px-3 py-1 rounded-full" style="background-color: ${issue.color}22; width: fit-content;">
+                      <span style="font-size: ${baseSize * 0.75}px; font-weight: 700; color: ${issue.color};">
+                        ⚠️ ${issue.severity}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="space-y-4">
+                <div>
+                  <div style="font-size: ${baseSize * 0.85}px; font-weight: 600; color: ${textColor}; opacity: 0.7; margin-bottom: 6px;">
+                    📋 Deskripsi:
+                  </div>
+                  <p style="font-size: ${baseSize * 0.9}px; color: ${textColor}; opacity: 0.9; line-height: 1.7;">
+                    ${issue.desc}
+                  </p>
+                </div>
+                
+                <div>
+                  <div style="font-size: ${baseSize * 0.85}px; font-weight: 600; color: ${textColor}; opacity: 0.7; margin-bottom: 6px;">
+                    💥 Dampak:
+                  </div>
+                  <p style="font-size: ${baseSize * 0.9}px; color: ${textColor}; opacity: 0.9; line-height: 1.7;">
+                    ${issue.impact}
+                  </p>
+                </div>
+                
+                <div class="rounded-lg p-3" style="background-color: ${issue.color}15;">
+                  <div style="font-size: ${baseSize * 0.85}px; font-weight: 600; color: ${issue.color}; margin-bottom: 4px;">
+                    📊 Data:
+                  </div>
+                  <p style="font-size: ${baseSize * 0.85}px; color: ${textColor}; opacity: 0.9; line-height: 1.6;">
+                    ${issue.data}
+                  </p>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function createSection5() {
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_action || defaultConfig.primary_action;
+      const secondaryColor = config.secondary_action || defaultConfig.secondary_action;
+      const dangerColor = '#ef4444';
+      
+      const pros = [
+        { title: 'Energi Tinggi', desc: 'Densitas energi sangat tinggi (42-47 MJ/kg), efisien untuk transportasi dan industri' },
+        { title: 'Infrastruktur Matang', desc: 'Sistem distribusi, pompa bensin, dan teknologi sudah tersedia luas di seluruh dunia' },
+        { title: 'Versatile', desc: 'Bahan baku untuk ribuan produk: plastik, obat-obatan, kosmetik, tekstil, pupuk' },
+        { title: 'Biaya Relatif Murah', desc: 'Dengan skala ekonomi besar, harga per unit energi kompetitif dibanding alternatif' },
+        { title: 'Portable', desc: 'Mudah disimpan dan diangkut dalam bentuk cair, cocok untuk kendaraan mobile' },
+        { title: 'Teknologi Proven', desc: 'Mesin dan generator berbasis minyak sudah teruji puluhan tahun dengan reliabilitas tinggi' }
+      ];
+      
+      const cons = [
+        { title: 'Tidak Terbarukan', desc: 'Akan habis dalam 50 tahun, perlu jutaan tahun untuk terbentuk kembali' },
+        { title: 'Polusi Udara', desc: 'Emisi NOx, SOx, CO, dan partikulat menyebabkan penyakit pernapasan dan kematian prematur' },
+        { title: 'Pemanasan Global', desc: 'Emisi CO₂ menyebabkan perubahan iklim, kenaikan suhu bumi, dan cuaca ekstrem' },
+        { title: 'Tumpahan Minyak', desc: 'Kecelakaan tanker dan rig minyak merusak ekosistem laut dan pantai secara masif' },
+        { title: 'Konflik Geopolitik', desc: 'Perebutan sumber daya minyak memicu perang, ketegangan internasional, dan ketidakstabilan' },
+        { title: 'Ketergantungan', desc: 'Negara importir rentan terhadap fluktuasi harga dan embargo dari negara produsen' }
+      ];
+      
+      return `
+        <div class="grid lg:grid-cols-2 gap-8">
+          <!-- Kelebihan -->
+          <div class="rounded-xl p-6" 
+               style="background: linear-gradient(135deg, ${primaryColor}15 0%, ${secondaryColor}15 100%); border: 2px solid ${secondaryColor};">
+            <div class="flex items-center space-x-3 mb-6">
+              <div style="font-size: ${baseSize * 2}px;">✅</div>
+              <h3 style="font-size: ${baseSize * 1.5}px; font-weight: 700; color: ${secondaryColor};">
+                Kelebihan
+              </h3>
+            </div>
+            
+            <div class="space-y-4">
+              ${pros.map((pro, index) => `
+                <div class="table-row rounded-lg p-4 fade-in" 
+                     style="background-color: ${surfaceColor}; animation-delay: ${index * 0.1}s;">
+                  <div style="font-size: ${baseSize * 1.05}px; font-weight: 700; color: ${secondaryColor}; margin-bottom: 6px;">
+                    ${index + 1}. ${pro.title}
+                  </div>
+                  <p style="font-size: ${baseSize * 0.9}px; color: ${textColor}; opacity: 0.9; line-height: 1.6;">
+                    ${pro.desc}
+                  </p>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+          
+          <!-- Kekurangan -->
+          <div class="rounded-xl p-6" 
+               style="background: linear-gradient(135deg, ${dangerColor}15 0%, #f59e0b15 100%); border: 2px solid ${dangerColor};">
+            <div class="flex items-center space-x-3 mb-6">
+              <div style="font-size: ${baseSize * 2}px;">❌</div>
+              <h3 style="font-size: ${baseSize * 1.5}px; font-weight: 700; color: ${dangerColor};">
+                Kekurangan
+              </h3>
+            </div>
+            
+            <div class="space-y-4">
+              ${cons.map((con, index) => `
+                <div class="table-row rounded-lg p-4 fade-in" 
+                     style="background-color: ${surfaceColor}; animation-delay: ${index * 0.1}s;">
+                  <div style="font-size: ${baseSize * 1.05}px; font-weight: 700; color: ${dangerColor}; margin-bottom: 6px;">
+                    ${index + 1}. ${con.title}
+                  </div>
+                  <p style="font-size: ${baseSize * 0.9}px; color: ${textColor}; opacity: 0.9; line-height: 1.6;">
+                    ${con.desc}
+                  </p>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+        
+        <div class="highlight-box mt-8" style="background-color: ${primaryColor}15; border-color: ${primaryColor};">
+          <div style="font-size: ${baseSize * 1.1}px; font-weight: 700; color: ${primaryColor}; margin-bottom: 12px;">
+            ⚖️ Kesimpulan
+          </div>
+          <p style="font-size: ${baseSize * 0.95}px; color: ${textColor}; line-height: 1.7;">
+            Meski minyak bumi memiliki keunggulan sebagai sumber energi dengan infrastruktur matang dan aplikasi luas, dampak negatifnya terhadap lingkungan, kesehatan, dan keberlanjutan sangat signifikan. Transisi ke energi terbarukan dan teknologi bersih menjadi kebutuhan mendesak untuk masa depan yang berkelanjutan.
+          </p>
+        </div>
+      `;
+    }
+
+    function createSection6() {
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_action || defaultConfig.primary_action;
+      const secondaryColor = config.secondary_action || defaultConfig.secondary_action;
+      
+      const solutions = [
+        {
+          title: 'Energi Surya',
+          icon: '☀️',
+          desc: 'Panel fotovoltaik mengkonversi cahaya matahari menjadi listrik. Teknologi bersih, tanpa emisi, biaya operasional rendah.',
+          potential: 'Potensi tak terbatas, efisiensi panel mencapai 20-25%, harga turun drastis dalam dekade terakhir.',
+          color: '#f59e0b'
+        },
+        {
+          title: 'Energi Angin',
+          icon: '💨',
+          desc: 'Turbin angin mengubah energi kinetik angin menjadi listrik. Cocok untuk daerah pesisir dan dataran tinggi.',
+          potential: 'Pertumbuhan 20%/tahun, kapasitas global >800 GW, biaya kompetitif dengan bahan bakar fosil.',
+          color: '#14b8a6'
+        },
+        {
+          title: 'Energi Hidrogen',
+          icon: '💧',
+          desc: 'Fuel cell menggunakan hidrogen untuk menghasilkan listrik dengan emisi hanya H₂O. Cocok untuk transportasi.',
+          potential: 'Hidrogen hijau dari elektrolisis air dengan energi terbarukan, penyimpanan energi jangka panjang.',
+          color: primaryColor
+        },
+        {
+          title: 'Kendaraan Listrik',
+          icon: '🚗',
+          desc: 'EV dengan baterai lithium-ion menggantikan mesin pembakaran internal. Zero emission di titik penggunaan.',
+          potential: 'Pasar EV tumbuh 100%/tahun, Tesla, BYD memimpin inovasi, infrastruktur charging berkembang pesat.',
+          color: secondaryColor
+        },
+        {
+          title: 'Biofuel',
+          icon: '🌾',
+          desc: 'Biodiesel dan bioetanol dari tanaman (jagung, tebu, kelapa sawit, alga). Drop-in fuel untuk mesin existing.',
+          potential: 'Gen-2 biofuel dari limbah dan alga lebih sustainable, tidak bersaing dengan pangan.',
+          color: '#10b981'
+        },
+        {
+          title: 'Carbon Capture',
+          icon: '🏭',
+          desc: 'Teknologi CCS menangkap CO₂ dari pembangkit listrik dan industri, kemudian menyimpannya underground.',
+          potential: 'Mengurangi emisi 90%, teknologi direct air capture (DAC) sedang berkembang untuk remove CO₂ dari udara.',
+          color: '#8b5cf6'
+        }
+      ];
+      
+      return `
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          ${solutions.map((sol, index) => `
+            <div class="solution-card rounded-xl p-6 fade-in" 
+                 style="background-color: ${surfaceColor}; border: 2px solid ${sol.color}; animation-delay: ${index * 0.1}s;">
+              <div style="font-size: ${baseSize * 3}px; margin-bottom: 12px;">${sol.icon}</div>
+              <h3 style="font-size: ${baseSize * 1.2}px; font-weight: 700; color: ${sol.color}; margin-bottom: 12px;">
+                ${sol.title}
+              </h3>
+              <p style="font-size: ${baseSize * 0.9}px; color: ${textColor}; opacity: 0.9; line-height: 1.7; margin-bottom: 12px;">
+                ${sol.desc}
+              </p>
+              <div class="rounded-lg p-3" style="background-color: ${sol.color}15;">
+                <div style="font-size: ${baseSize * 0.8}px; font-weight: 600; color: ${sol.color}; margin-bottom: 4px;">
+                  📈 Potensi:
+                </div>
+                <p style="font-size: ${baseSize * 0.85}px; color: ${textColor}; opacity: 0.85; line-height: 1.6;">
+                  ${sol.potential}
+                </p>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="highlight-box" style="background-color: ${primaryColor}15; border-color: ${primaryColor};">
+            <div style="font-size: ${baseSize * 1.1}px; font-weight: 700; color: ${primaryColor}; margin-bottom: 12px;">
+              🎯 Efisiensi & Konservasi
+            </div>
+            <ul class="space-y-2">
+              ${[
+                'Hemat energi: insulasi bangunan, lampu LED (75% lebih efisien)',
+                'Transportasi publik massal mengurangi emisi per capita',
+                'Smart grid dan IoT untuk optimalisasi konsumsi energi',
+                'Daur ulang plastik dan material berbasis minyak'
+              ].map(item => `
+                <li style="font-size: ${baseSize * 0.9}px; color: ${textColor}; opacity: 0.9; line-height: 1.7; padding-left: 8px;">
+                  • ${item}
+                </li>
+              `).join('')}
+            </ul>
+          </div>
+          
+          <div class="highlight-box" style="background-color: ${secondaryColor}15; border-color: ${secondaryColor};">
+            <div style="font-size: ${baseSize * 1.1}px; font-weight: 700; color: ${secondaryColor}; margin-bottom: 12px;">
+              📜 Kebijakan & Regulasi
+            </div>
+            <ul class="space-y-2">
+              ${[
+                'Pajak karbon membuat polusi lebih mahal',
+                'Subsidi dan insentif untuk energi terbarukan',
+                'Standar emisi kendaraan Euro 6 / China 6',
+                'Paris Agreement: net-zero emission 2050'
+              ].map(item => `
+                <li style="font-size: ${baseSize * 0.9}px; color: ${textColor}; opacity: 0.9; line-height: 1.7; padding-left: 8px;">
+                  • ${item}
+                </li>
+              `).join('')}
+            </ul>
+          </div>
+        </div>
+      `;
+    }
+
+    function createSidebar() {
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_action || defaultConfig.primary_action;
+      
+      return `
+        <aside class="hidden lg:block w-64 flex-shrink-0">
+          <div class="sticky-sidebar rounded-xl p-6" 
+               style="background-color: ${surfaceColor}; border: 2px solid ${primaryColor}33;">
+            <h3 style="font-size: ${baseSize * 1.1}px; font-weight: 700; color: ${textColor}; margin-bottom: 16px;">
+              📑 Navigasi Cepat
+            </h3>
+            <div class="space-y-2">
+              ${sections.map(section => `
+                <div class="nav-item ${activeSection === section.id ? 'active' : ''} rounded-lg px-4 py-3"
+                     onclick="scrollToSection(${section.id})"
+                     style="color: ${activeSection === section.id ? section.color : textColor}; background-color: ${activeSection === section.id ? section.color + '15' : 'transparent'};">
+                  <div class="flex items-center space-x-3">
+                    <span style="font-size: ${baseSize * 1.3}px;">${section.icon}</span>
+                    <span style="font-size: ${baseSize * 0.85}px; font-weight: ${activeSection === section.id ? '700' : '500'};">
+                      ${config[section.configKey] || sections.find(s => s.id === section.id).configKey}
+                    </span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </aside>
+      `;
+    }
+
+    function createMobileNav() {
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_action || defaultConfig.primary_action;
+      
+      return `
+        <div class="lg:hidden mb-6">
+          <button onclick="toggleMobileNav()" 
+                  class="w-full rounded-xl px-6 py-4 flex items-center justify-between"
+                  style="background-color: ${surfaceColor}; border: 2px solid ${primaryColor};">
+            <span style="font-size: ${baseSize}px; font-weight: 700; color: ${textColor};">
+              📑 Navigasi Materi
+            </span>
+            <span style="font-size: ${baseSize * 1.2}px; color: ${primaryColor};">
+              ${mobileNavOpen ? '▲' : '▼'}
+            </span>
+          </button>
+          
+          <div class="mobile-nav-dropdown ${mobileNavOpen ? 'open' : ''} rounded-xl mt-2 overflow-hidden"
+               style="background-color: ${surfaceColor};">
+            <div class="p-4 space-y-2">
+              ${sections.map(section => `
+                <div class="rounded-lg px-4 py-3 cursor-pointer"
+                     onclick="scrollToSection(${section.id})"
+                     style="background-color: ${activeSection === section.id ? section.color + '15' : 'transparent'}; color: ${activeSection === section.id ? section.color : textColor};">
+                  <div class="flex items-center space-x-3">
+                    <span style="font-size: ${baseSize * 1.3}px;">${section.icon}</span>
+                    <span style="font-size: ${baseSize * 0.9}px; font-weight: ${activeSection === section.id ? '700' : '500'};">
+                      ${config[section.configKey] || sections.find(s => s.id === section.id).configKey}
+                    </span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function createApp() {
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const bgColor = config.background_color || defaultConfig.background_color;
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_action || defaultConfig.primary_action;
+      const secondaryColor = config.secondary_action || defaultConfig.secondary_action;
+      
+      return `
+        <div class="w-full min-h-full" style="background-color: ${bgColor}; color: ${textColor}; font-family: '${customFont}', sans-serif;">
+          <!-- Header -->
+          <header class="w-full py-8" style="background-color: ${surfaceColor};">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <button onclick="window.history.back()" 
+                      class="mb-6 flex items-center space-x-2 hover:opacity-80 transition-opacity"
+                      style="color: ${primaryColor}; font-size: ${baseSize * 0.9}px; font-weight: 600;">
+                <span>${config.back_button || defaultConfig.back_button}</span>
+              </button>
+              
+              <div class="text-center">
+                <div style="font-size: ${baseSize * 3}px; margin-bottom: 16px;">📚</div>
+                <h1 style="font-size: ${baseSize * 2.5}px; font-weight: 800; color: ${textColor}; margin-bottom: 12px;">
+                  ${config.page_title || defaultConfig.page_title}
+                </h1>
+                <p style="font-size: ${baseSize * 1.1}px; color: ${textColor}; opacity: 0.8;">
+                  ${config.page_subtitle || defaultConfig.page_subtitle}
+                </p>
+              </div>
+            </div>
+          </header>
+
+          <!-- Main Content -->
+          <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            ${createMobileNav()}
+            
+            <div class="flex gap-8">
+              ${createSidebar()}
+              
+              <div class="flex-1 min-w-0 space-y-8">
+                ${sections.map((section, index) => {
+                  const isExpanded = expandedSections.has(section.id);
+                  let content = '';
+                  
+                  if (section.id === 1) content = createSection1();
+                  else if (section.id === 2) content = createSection2();
+                  else if (section.id === 3) content = createSection3();
+                  else if (section.id === 4) content = createSection4();
+                  else if (section.id === 5) content = createSection5();
+                  else if (section.id === 6) content = createSection6();
+                  
+                  return `
+                    <section id="section-${section.id}" class="accordion-section fade-in rounded-2xl overflow-hidden" 
+                             style="background-color: ${surfaceColor}; border: 3px solid ${section.color};">
+                      <div class="accordion-header p-6"
+                           onclick="toggleSection(${section.id})"
+                           style="background: linear-gradient(135deg, ${section.color}22 0%, ${section.color}11 100%);">
+                        <div class="flex items-center justify-between">
+                          <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 rounded-2xl flex items-center justify-center"
+                                 style="background: ${section.color};">
+                              <span style="font-size: ${baseSize * 2}px;">${section.icon}</span>
+                            </div>
+                            <div>
+                              <div style="font-size: ${baseSize * 0.8}px; color: ${section.color}; font-weight: 600; margin-bottom: 4px;">
+                                BAGIAN ${index + 1}
+                              </div>
+                              <h2 style="font-size: ${baseSize * 1.8}px; font-weight: 700; color: ${textColor};">
+                                ${config[section.configKey] || section.configKey}
+                              </h2>
+                            </div>
+                          </div>
+                          <div style="font-size: ${baseSize * 1.8}px; color: ${section.color};">
+                            ${isExpanded ? '▲' : '▼'}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="accordion-content ${isExpanded ? 'expanded' : ''}" 
+                           style="background-color: ${surfaceColor};">
+                        <div class="p-6">
+                          ${content}
+                        </div>
+                      </div>
+                    </section>
+                  `;
+                }).join('')}
+                
+                <!-- Next Button -->
+                <div class="flex justify-center pt-8">
+                  <button onclick="alert('Navigasi ke halaman Simulasi')"
+                          class="px-8 py-4 rounded-xl transition-all hover:scale-105"
+                          style="background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%); color: white; font-size: ${baseSize * 1.1}px; font-weight: 700; box-shadow: 0 10px 25px ${primaryColor}44;">
+                    ${config.next_button || defaultConfig.next_button}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      `;
+    }
+
+    async function onConfigChange(newConfig) {
+      config = { ...config, ...newConfig };
+      updateUI();
+    }
+
+    function updateUI() {
+      const app = document.getElementById('app');
+      if (app) {
+        app.innerHTML = createApp();
+      }
+      
+      window.removeEventListener('scroll', updateProgress);
+      window.addEventListener('scroll', updateProgress);
+      updateProgress();
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [
+          {
+            get: () => config.background_color || defaultConfig.background_color,
+            set: (value) => {
+              config.background_color = value;
+              window.elementSdk.setConfig({ background_color: value });
+            }
+          },
+          {
+            get: () => config.surface_color || defaultConfig.surface_color,
+            set: (value) => {
+              config.surface_color = value;
+              window.elementSdk.setConfig({ surface_color: value });
+            }
+          },
+          {
+            get: () => config.text_color || defaultConfig.text_color,
+            set: (value) => {
+              config.text_color = value;
+              window.elementSdk.setConfig({ text_color: value });
+            }
+          },
+          {
+            get: () => config.primary_action || defaultConfig.primary_action,
+            set: (value) => {
+              config.primary_action = value;
+              window.elementSdk.setConfig({ primary_action: value });
+            }
+          },
+          {
+            get: () => config.secondary_action || defaultConfig.secondary_action,
+            set: (value) => {
+              config.secondary_action = value;
+              window.elementSdk.setConfig({ secondary_action: value });
+            }
+          }
+        ],
+        borderables: [],
+        fontEditable: {
+          get: () => config.font_family || defaultConfig.font_family,
+          set: (value) => {
+            config.font_family = value;
+            window.elementSdk.setConfig({ font_family: value });
+          }
+        },
+        fontSizeable: {
+          get: () => config.font_size || defaultConfig.font_size,
+          set: (value) => {
+            config.font_size = value;
+            window.elementSdk.setConfig({ font_size: value });
+          }
+        }
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ["page_title", config.page_title || defaultConfig.page_title],
+        ["page_subtitle", config.page_subtitle || defaultConfig.page_subtitle],
+        ["section_1_title", config.section_1_title || defaultConfig.section_1_title],
+        ["section_2_title", config.section_2_title || defaultConfig.section_2_title],
+        ["section_3_title", config.section_3_title || defaultConfig.section_3_title],
+        ["section_4_title", config.section_4_title || defaultConfig.section_4_title],
+        ["section_5_title", config.section_5_title || defaultConfig.section_5_title],
+        ["section_6_title", config.section_6_title || defaultConfig.section_6_title],
+        ["next_button", config.next_button || defaultConfig.next_button],
+        ["back_button", config.back_button || defaultConfig.back_button]
+      ]);
+    }
+
+    async function init() {
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig,
+          onConfigChange,
+          mapToCapabilities,
+          mapToEditPanelValues
+        });
+        
+        config = window.elementSdk.config;
+      }
+      
+      updateUI();
+    }
+
+    window.toggleSection = toggleSection;
+    window.scrollToSection = scrollToSection;
+    window.toggleMobileNav = toggleMobileNav;
+    window.toggleTimeline = toggleTimeline;
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a3ef30db6040ddc',t:'MTc2NDA1MDY3NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

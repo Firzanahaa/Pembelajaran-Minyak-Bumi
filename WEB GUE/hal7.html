@@ -1,0 +1,1140 @@
+<!doctype html>
+<html lang="id">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ringkasan Materi Minyak Bumi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
+    
+    * {
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .sticky-toc {
+      position: sticky;
+      top: 20px;
+      max-height: calc(100% - 40px);
+      overflow-y: auto;
+    }
+    
+    .accordion-header {
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .accordion-header:hover {
+      transform: translateX(8px);
+    }
+    
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease;
+    }
+    
+    .accordion-content.expanded {
+      max-height: 5000px;
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .checkbox-custom {
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border: 3px solid;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      flex-shrink: 0;
+    }
+    
+    .checkbox-custom:checked::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 16px;
+      font-weight: 900;
+      color: white;
+    }
+    
+    .highlight-box {
+      position: relative;
+      padding: 16px;
+      border-radius: 12px;
+      border-left: 4px solid;
+      margin: 16px 0;
+    }
+    
+    .mind-map-node {
+      transition: all 0.3s ease;
+    }
+    
+    .mind-map-node:hover {
+      transform: scale(1.05);
+    }
+    
+    .toc-item {
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    
+    .toc-item:hover {
+      transform: translateX(4px);
+    }
+    
+    .toc-item.active {
+      font-weight: 700;
+    }
+    
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      
+      .accordion-content {
+        max-height: none !important;
+      }
+      
+      .print-page-break {
+        page-break-after: always;
+      }
+    }
+    
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: rgba(251, 191, 36, 0.5);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(251, 191, 36, 0.8);
+    }
+    
+    .progress-ring {
+      transition: stroke-dashoffset 0.5s ease;
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="min-h-full">
+  <div id="app" class="w-full min-h-full"></div>
+  <script>
+    const defaultConfig = {
+      page_title: "Ringkasan Materi Minyak Bumi",
+      page_subtitle: "Panduan Lengkap & Komprehensif untuk Pembelajaran",
+      expand_all_button: "📖 Expand All",
+      collapse_all_button: "📕 Collapse All",
+      download_pdf_button: "📄 Download PDF",
+      download_png_button: "🖼️ Download PNG",
+      print_button: "🖨️ Cetak",
+      back_button: "← Kembali ke Beranda",
+      background_color: "#0f172a",
+      surface_color: "#1e293b",
+      text_color: "#f1f5f9",
+      primary_action: "#fbbf24",
+      secondary_action: "#14b8a6",
+      font_family: "Poppins",
+      font_size: 16
+    };
+
+    let config = { ...defaultConfig };
+    let expandedSections = new Set();
+    let checkedTopics = new Set();
+    let activeSection = '';
+
+    const summaryData = [
+      {
+        id: 1,
+        title: "Konsep Dasar Minyak Bumi",
+        icon: "🛢️",
+        color: "#3b82f6",
+        content: {
+          definisi: "Minyak bumi adalah campuran kompleks dari berbagai senyawa hidrokarbon yang terbentuk dari fosil organisme laut yang telah mati jutaan tahun yang lalu.",
+          komposisi: [
+            "Alkana (parafin): hidrokarbon jenuh rantai lurus atau bercabang",
+            "Sikloalkana (nafta): hidrokarbon jenuh dengan struktur cincin",
+            "Aromatik: hidrokarbon dengan ikatan rangkap terkonjugasi",
+            "Senyawa lain: mengandung S, N, O dalam jumlah kecil"
+          ],
+          sifatFisik: [
+            "Wujud: cair hingga semi-padat pada suhu ruang",
+            "Warna: hitam, coklat gelap, atau kehijauan",
+            "Bau: karakteristik khas menyengat",
+            "Mudah terbakar dan melepaskan energi besar",
+            "Tidak larut dalam air (non-polar)",
+            "Densitas lebih rendah dari air (mengapung di air)"
+          ],
+          rumus: "Rumus umum hidrokarbon: CₓHᵧ di mana x dan y bervariasi"
+        }
+      },
+      {
+        id: 2,
+        title: "Pembentukan Minyak Bumi",
+        icon: "🌍",
+        color: "#10b981",
+        content: {
+          bahanBaku: [
+            "Plankton mikroskopis (fitoplankton dan zooplankton)",
+            "Alga dan organisme laut primitif",
+            "Tumbuhan laut dan mikroorganisme",
+            "Material organik dari lingkungan laut"
+          ],
+          kondisi: [
+            "Tekanan tinggi dari lapisan sedimen di atasnya",
+            "Suhu 50-150°C (sweet spot untuk pembentukan minyak)",
+            "Lingkungan anaerobik (tanpa oksigen)",
+            "Waktu geologis: 10-600 juta tahun"
+          ],
+          tahapan: [
+            {
+              nama: "Diagenesis",
+              desc: "Dekomposisi biologis dan kimia awal oleh bakteri pada suhu <50°C, menghasilkan kerogen"
+            },
+            {
+              nama: "Katagenesis",
+              desc: "Transformasi termal kerogen menjadi hidrokarbon cair dan gas pada suhu 50-150°C"
+            },
+            {
+              nama: "Metagenesis",
+              desc: "Cracking termal pada suhu >150°C, menghasilkan lebih banyak gas alam"
+            }
+          ],
+          lokasi: "Terakumulasi dalam batuan reservoir berpori (sandstone/karbonat) yang terperangkap oleh seal rock (batuan kedap)"
+        }
+      },
+      {
+        id: 3,
+        title: "Pengolahan: Destilasi Bertingkat",
+        icon: "🏭",
+        color: "#10b981",
+        content: {
+          prinsip: "Pemisahan komponen minyak mentah berdasarkan perbedaan titik didih dalam menara destilasi (fractionating column). Komponen dengan titik didih rendah menguap lebih dulu dan naik ke bagian atas menara.",
+          fraksi: [
+            {
+              nama: "Gas Petroleum (C₁-C₄)",
+              titikDidih: "< 30°C",
+              kegunaan: "LPG untuk bahan bakar masak dan pemanas"
+            },
+            {
+              nama: "Bensin/Gasoline (C₅-C₁₂)",
+              titikDidih: "30-200°C",
+              kegunaan: "Bahan bakar kendaraan bermotor dengan mesin pembakaran internal"
+            },
+            {
+              nama: "Kerosin/Avtur (C₁₂-C₁₆)",
+              titikDidih: "150-275°C",
+              kegunaan: "Bahan bakar pesawat jet, lampu, dan pemanas"
+            },
+            {
+              nama: "Solar/Diesel (C₁₅-C₁₈)",
+              titikDidih: "250-350°C",
+              kegunaan: "Bahan bakar mesin diesel (truk, bus, kapal)"
+            },
+            {
+              nama: "Oli Pelumas (C₂₀-C₃₀)",
+              titikDidih: "300-370°C",
+              kegunaan: "Pelumas mesin, oli motor, gemuk"
+            },
+            {
+              nama: "Aspal/Residu (>C₃₀)",
+              titikDidih: "> 370°C",
+              kegunaan: "Perkerasan jalan, waterproofing, isolasi"
+            }
+          ],
+          pola: "Makin ke ATAS menara: titik didih RENDAH, molekul KECIL, lebih VOLATILE (mudah menguap). Makin ke BAWAH: titik didih TINGGI, molekul BESAR, lebih KENTAL."
+        }
+      },
+      {
+        id: 4,
+        title: "Hidrokarbon dalam Minyak Bumi",
+        icon: "⚗️",
+        color: "#3b82f6",
+        content: {
+          alkana: {
+            definisi: "Hidrokarbon alifatik jenuh dengan ikatan tunggal C-C",
+            rumus: "CₙH₂ₙ₊₂",
+            sifat: [
+              "Semua ikatan adalah ikatan tunggal (sigma)",
+              "Makin panjang rantai karbon, makin tinggi titik didih",
+              "Makin panjang rantai, makin kental (viskositas tinggi)",
+              "Reaktivitas rendah (jenuh)"
+            ],
+            contoh: [
+              "Metana (CH₄): gas alam, titik didih -162°C",
+              "Etana (C₂H₆): LPG, titik didih -89°C",
+              "Propana (C₃H₈): LPG, titik didih -42°C",
+              "Butana (C₄H₁₀): korek gas, titik didih -1°C",
+              "Oktana (C₈H₁₈): komponen bensin"
+            ]
+          },
+          sikloalkana: {
+            definisi: "Hidrokarbon jenuh dengan struktur cincin",
+            contoh: "Sikloheksana (C₆H₁₂)"
+          },
+          aromatik: {
+            definisi: "Hidrokarbon dengan cincin benzena dan ikatan rangkap terkonjugasi",
+            contoh: "Benzena (C₆H₆), Toluena (C₇H₈)"
+          }
+        }
+      },
+      {
+        id: 5,
+        title: "Manfaat Minyak Bumi",
+        icon: "✨",
+        color: "#10b981",
+        content: {
+          energi: [
+            "Bensin: bahan bakar kendaraan bermotor (mobil, motor)",
+            "Solar/Diesel: truk, bus, kapal, generator listrik",
+            "LPG: bahan bakar masak rumah tangga dan industri",
+            "Kerosin/Avtur: pesawat jet dan pemanas",
+            "Bahan bakar pembangkit listrik"
+          ],
+          bahanBaku: [
+            "Plastik: polietilen, polipropilen, PVC, PET",
+            "Karet sintetis: ban kendaraan, sepatu",
+            "Serat sintetis: nilon, poliester untuk tekstil",
+            "Detergen dan sabun sintetis",
+            "Kosmetik dan produk perawatan"
+          ],
+          industri: [
+            "Oli pelumas: mengurangi gesekan mesin",
+            "Aspal: konstruksi jalan raya",
+            "Lilin parafin: lilin, krayon",
+            "Vaseline: petroleum jelly",
+            "Cat dan pelarut"
+          ],
+          petrokimia: [
+            "Pupuk sintetis: urea, amonium nitrat",
+            "Pestisida: insektisida, herbisida",
+            "Obat-obatan: aspirin, antibiotik sintetis",
+            "Bahan kimia industri: metanol, etilena, propilena"
+          ]
+        }
+      },
+      {
+        id: 6,
+        title: "Dampak dan Masalah",
+        icon: "⚠️",
+        color: "#f59e0b",
+        content: {
+          dampakPositif: [
+            "Sumber energi besar dan terkonsentrasi",
+            "Pendorong pertumbuhan ekonomi global",
+            "Penciptaan lapangan kerja (eksplorasi, produksi, distribusi)",
+            "Infrastruktur transportasi modern",
+            "Bahan baku industri petrokimia"
+          ],
+          dampakNegatif: {
+            lingkungan: [
+              "Emisi CO₂ dan gas rumah kaca → pemanasan global",
+              "Polusi udara: NOx, SO₂, partikulat → masalah kesehatan",
+              "Tumpahan minyak: merusak ekosistem laut dan pantai",
+              "Pencemaran tanah dan air tanah",
+              "Kerusakan habitat dan keanekaragaman hayati"
+            ],
+            ekonomi: [
+              "Sumber daya TIDAK TERBARUKAN (akan habis)",
+              "Fluktuasi harga minyak → ketidakstabilan ekonomi",
+              "Ketergantungan pada impor untuk negara non-produsen",
+              "Biaya ekstraksi meningkat (sumur makin dalam)"
+            ],
+            sosial: [
+              "Konflik geopolitik memperebutkan cadangan minyak",
+              "Ketergantungan energi pada satu sumber",
+              "Kesenjangan ekonomi negara produsen vs konsumen",
+              "Dampak kesehatan: penyakit pernapasan, kanker"
+            ]
+          }
+        }
+      },
+      {
+        id: 7,
+        title: "Solusi Keberlanjutan",
+        icon: "🌱",
+        color: "#8b5cf6",
+        content: {
+          energiAlternatif: [
+            "Energi surya: panel fotovoltaik, tenaga matahari terkonsentrasi",
+            "Energi angin: turbin angin darat dan lepas pantai",
+            "Energi air: PLTA (hydroelectric)",
+            "Energi nuklir: fisi nuklir (uranium)",
+            "Hidrogen: fuel cell untuk kendaraan masa depan",
+            "Geotermal: panas bumi",
+            "Biofuel: biodiesel, bioetanol dari tanaman"
+          ],
+          efisiensi: [
+            "Hemat energi: insulasi bangunan, lampu LED",
+            "Transportasi publik massal dan berbagi kendaraan",
+            "Kendaraan hybrid dan listrik (EV)",
+            "Daur ulang plastik dan material berbasis minyak",
+            "Smart grid dan manajemen energi"
+          ],
+          teknologi: [
+            "Carbon Capture and Storage (CCS): menangkap CO₂ dari pembakaran",
+            "Biofuel generasi lanjut: dari alga dan limbah",
+            "Kendaraan listrik dengan baterai lithium-ion",
+            "Hydrogen fuel cells: emisi hanya H₂O",
+            "Plastik biodegradable: dari pati, PLA"
+          ],
+          kebijakan: [
+            "Transisi energi: mengurangi subsidi bahan bakar fosil",
+            "Subsidi dan insentif untuk energi terbarukan",
+            "Pajak karbon: membuat polusi lebih mahal",
+            "Standar emisi kendaraan yang ketat",
+            "Investasi R&D energi bersih",
+            "Perjanjian internasional: Paris Agreement"
+          ]
+        }
+      }
+    ];
+
+    function getCheckedTopics() {
+      try {
+        const saved = localStorage.getItem('summary_checked_topics');
+        return saved ? new Set(JSON.parse(saved)) : new Set();
+      } catch {
+        return new Set();
+      }
+    }
+
+    function saveCheckedTopics() {
+      try {
+        localStorage.setItem('summary_checked_topics', JSON.stringify([...checkedTopics]));
+      } catch (e) {
+        console.error('Failed to save progress');
+      }
+    }
+
+    function toggleCheck(topicId) {
+      if (checkedTopics.has(topicId)) {
+        checkedTopics.delete(topicId);
+      } else {
+        checkedTopics.add(topicId);
+      }
+      saveCheckedTopics();
+      updateUI();
+    }
+
+    function toggleSection(sectionId) {
+      if (expandedSections.has(sectionId)) {
+        expandedSections.delete(sectionId);
+      } else {
+        expandedSections.add(sectionId);
+      }
+      updateUI();
+    }
+
+    function expandAll() {
+      summaryData.forEach(section => expandedSections.add(section.id));
+      updateUI();
+    }
+
+    function collapseAll() {
+      expandedSections.clear();
+      updateUI();
+    }
+
+    function scrollToSection(sectionId) {
+      activeSection = sectionId;
+      updateUI();
+      
+      setTimeout(() => {
+        const element = document.getElementById(`section-${sectionId}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    }
+
+    async function downloadPNG() {
+      const content = document.getElementById('summary-content');
+      if (!content) return;
+      
+      const originalExpanded = new Set(expandedSections);
+      summaryData.forEach(section => expandedSections.add(section.id));
+      updateUI();
+      
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      try {
+        const canvas = await html2canvas(content, {
+          backgroundColor: config.background_color || defaultConfig.background_color,
+          scale: 2,
+          logging: false,
+          windowWidth: 1200
+        });
+        
+        const link = document.createElement('a');
+        link.download = `Ringkasan_Minyak_Bumi_${new Date().toLocaleDateString('id-ID')}.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+        
+        showNotification('Ringkasan berhasil diunduh sebagai PNG!', 'success');
+      } catch (error) {
+        showNotification('Gagal mengunduh PNG. Coba lagi.', 'error');
+      }
+      
+      expandedSections = originalExpanded;
+      updateUI();
+    }
+
+    async function downloadPDF() {
+      const originalExpanded = new Set(expandedSections);
+      summaryData.forEach(section => expandedSections.add(section.id));
+      updateUI();
+      
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      try {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const margin = 20;
+        let yPos = margin;
+        
+        pdf.setFontSize(24);
+        pdf.setFont(undefined, 'bold');
+        pdf.text('Ringkasan Materi', pageWidth / 2, yPos, { align: 'center' });
+        yPos += 10;
+        pdf.text('Minyak Bumi', pageWidth / 2, yPos, { align: 'center' });
+        yPos += 15;
+        
+        pdf.setFontSize(12);
+        pdf.setFont(undefined, 'normal');
+        pdf.text(new Date().toLocaleDateString('id-ID', { 
+          weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+        }), pageWidth / 2, yPos, { align: 'center' });
+        
+        pdf.addPage();
+        yPos = margin;
+        
+        pdf.setFontSize(16);
+        pdf.setFont(undefined, 'bold');
+        pdf.text('Daftar Isi', margin, yPos);
+        yPos += 10;
+        
+        pdf.setFontSize(11);
+        pdf.setFont(undefined, 'normal');
+        summaryData.forEach((section, index) => {
+          pdf.text(`${index + 1}. ${section.title}`, margin + 5, yPos);
+          yPos += 7;
+        });
+        
+        summaryData.forEach((section, index) => {
+          pdf.addPage();
+          yPos = margin;
+          
+          pdf.setFontSize(18);
+          pdf.setFont(undefined, 'bold');
+          pdf.text(`${index + 1}. ${section.title}`, margin, yPos);
+          yPos += 12;
+          
+          pdf.setFontSize(10);
+          pdf.setFont(undefined, 'normal');
+          
+          const addText = (text, indent = 0) => {
+            const lines = pdf.splitTextToSize(text, pageWidth - 2 * margin - indent);
+            lines.forEach(line => {
+              if (yPos > pageHeight - margin) {
+                pdf.addPage();
+                yPos = margin;
+              }
+              pdf.text(line, margin + indent, yPos);
+              yPos += 6;
+            });
+          };
+          
+          if (section.content.definisi) {
+            addText(section.content.definisi);
+            yPos += 3;
+          }
+          
+          Object.entries(section.content).forEach(([key, value]) => {
+            if (key === 'definisi' || key === 'rumus' || key === 'prinsip' || key === 'lokasi' || key === 'pola') {
+              if (key !== 'definisi') {
+                addText(value);
+                yPos += 3;
+              }
+            } else if (Array.isArray(value)) {
+              value.forEach(item => {
+                if (typeof item === 'string') {
+                  addText(`• ${item}`, 5);
+                } else if (item.nama) {
+                  addText(`• ${item.nama}: ${item.desc || item.kegunaan}`, 5);
+                }
+              });
+              yPos += 3;
+            } else if (typeof value === 'object') {
+              Object.entries(value).forEach(([subKey, subValue]) => {
+                pdf.setFont(undefined, 'bold');
+                addText(subKey.toUpperCase());
+                pdf.setFont(undefined, 'normal');
+                if (Array.isArray(subValue)) {
+                  subValue.forEach(item => {
+                    if (typeof item === 'string') {
+                      addText(`• ${item}`, 5);
+                    }
+                  });
+                } else {
+                  addText(subValue, 5);
+                }
+                yPos += 3;
+              });
+            }
+          });
+        });
+        
+        const totalPages = pdf.internal.pages.length - 1;
+        for (let i = 1; i <= totalPages; i++) {
+          pdf.setPage(i);
+          pdf.setFontSize(9);
+          pdf.text(`Halaman ${i} dari ${totalPages}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+        }
+        
+        pdf.save(`Ringkasan_Minyak_Bumi_${new Date().toLocaleDateString('id-ID')}.pdf`);
+        showNotification('PDF berhasil diunduh!', 'success');
+      } catch (error) {
+        showNotification('Gagal membuat PDF. Coba lagi.', 'error');
+      }
+      
+      expandedSections = originalExpanded;
+      updateUI();
+    }
+
+    function printPage() {
+      const originalExpanded = new Set(expandedSections);
+      summaryData.forEach(section => expandedSections.add(section.id));
+      updateUI();
+      
+      setTimeout(() => {
+        window.print();
+        expandedSections = originalExpanded;
+        updateUI();
+      }, 500);
+    }
+
+    function showNotification(message, type) {
+      const notification = document.createElement('div');
+      notification.className = 'fixed top-4 right-4 px-6 py-4 rounded-lg shadow-lg z-50 fade-in';
+      notification.style.backgroundColor = type === 'error' ? '#ef4444' : '#10b981';
+      notification.style.color = 'white';
+      notification.style.fontWeight = '600';
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
+    }
+
+    function getProgressPercentage() {
+      return Math.round((checkedTopics.size / summaryData.length) * 100);
+    }
+
+    function createMindMap() {
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_action || defaultConfig.primary_action;
+      
+      return `
+        <div class="relative w-full h-96 mb-12 flex items-center justify-center no-print">
+          <!-- Center Node -->
+          <div class="absolute mind-map-node rounded-2xl px-8 py-6 text-center z-10"
+               style="background: linear-gradient(135deg, ${primaryColor} 0%, ${config.secondary_action || defaultConfig.secondary_action} 100%); left: 50%; top: 50%; transform: translate(-50%, -50%);">
+            <div style="font-size: ${baseSize * 2.5}px; margin-bottom: 8px;">🛢️</div>
+            <div style="font-size: ${baseSize * 1.3}px; font-weight: 800; color: white;">
+              MINYAK BUMI
+            </div>
+          </div>
+          
+          ${summaryData.map((section, index) => {
+            const angle = (index / summaryData.length) * 2 * Math.PI - Math.PI / 2;
+            const radius = 180;
+            const x = 50 + radius * Math.cos(angle) / 3.5;
+            const y = 50 + radius * Math.sin(angle) / 3.5;
+            
+            return `
+              <!-- Branch Line -->
+              <svg class="absolute w-full h-full" style="pointer-events: none;">
+                <line x1="50%" y1="50%" 
+                      x2="${x}%" y2="${y}%" 
+                      stroke="${section.color}" 
+                      stroke-width="3" 
+                      stroke-dasharray="5,5"
+                      opacity="0.5"/>
+              </svg>
+              
+              <!-- Branch Node -->
+              <div class="absolute mind-map-node rounded-xl px-4 py-3 text-center cursor-pointer"
+                   onclick="scrollToSection(${section.id})"
+                   style="background-color: ${section.color}; left: ${x}%; top: ${y}%; transform: translate(-50%, -50%);">
+                <div style="font-size: ${baseSize * 1.5}px; margin-bottom: 4px;">${section.icon}</div>
+                <div style="font-size: ${baseSize * 0.75}px; font-weight: 600; color: white; white-space: nowrap;">
+                  ${section.title.split(' ')[0]}
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    function createSectionContent(section) {
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const bgColor = config.background_color || defaultConfig.background_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      
+      let html = '';
+      
+      Object.entries(section.content).forEach(([key, value]) => {
+        if (key === 'definisi') {
+          html += `
+            <div class="highlight-box" style="background-color: ${section.color}22; border-color: ${section.color};">
+              <div style="font-size: ${baseSize * 0.95}px; color: ${textColor}; line-height: 1.8;">
+                ${value}
+              </div>
+            </div>
+          `;
+        } else if (key === 'rumus' || key === 'prinsip' || key === 'lokasi' || key === 'pola') {
+          html += `
+            <div class="highlight-box" style="background-color: ${config.primary_action || defaultConfig.primary_action}22; border-color: ${config.primary_action || defaultConfig.primary_action};">
+              <div style="font-size: ${baseSize * 0.9}px; font-weight: 600; color: ${config.primary_action || defaultConfig.primary_action}; margin-bottom: 8px;">
+                💡 ${key === 'rumus' ? 'RUMUS' : key === 'prinsip' ? 'PRINSIP' : key === 'lokasi' ? 'LOKASI' : 'POLA'}
+              </div>
+              <div style="font-size: ${baseSize * 0.9}px; color: ${textColor}; line-height: 1.7;">
+                ${value}
+              </div>
+            </div>
+          `;
+        } else if (Array.isArray(value)) {
+          html += `<div class="ml-4 space-y-2 mb-4">`;
+          value.forEach(item => {
+            if (typeof item === 'string') {
+              html += `
+                <div class="flex items-start space-x-3">
+                  <span style="color: ${section.color}; font-size: ${baseSize}px; margin-top: 2px;">•</span>
+                  <span style="font-size: ${baseSize * 0.9}px; color: ${textColor}; line-height: 1.7; flex: 1;">
+                    ${item}
+                  </span>
+                </div>
+              `;
+            } else if (item.nama) {
+              html += `
+                <div class="ml-4 mb-3 p-3 rounded-lg" style="background-color: ${bgColor};">
+                  <div style="font-size: ${baseSize * 0.95}px; font-weight: 600; color: ${section.color}; margin-bottom: 4px;">
+                    ${item.nama}${item.titikDidih ? ` (${item.titikDidih})` : ''}
+                  </div>
+                  <div style="font-size: ${baseSize * 0.85}px; color: ${textColor}; opacity: 0.9; line-height: 1.6;">
+                    ${item.desc || item.kegunaan}
+                  </div>
+                </div>
+              `;
+            }
+          });
+          html += `</div>`;
+        } else if (typeof value === 'object') {
+          html += `<div class="space-y-4">`;
+          Object.entries(value).forEach(([subKey, subValue]) => {
+            html += `
+              <div>
+                <div style="font-size: ${baseSize}px; font-weight: 700; color: ${section.color}; margin-bottom: 8px; text-transform: uppercase;">
+                  ${subKey}
+                </div>
+            `;
+            
+            if (typeof subValue === 'string') {
+              html += `
+                <div style="font-size: ${baseSize * 0.9}px; color: ${textColor}; opacity: 0.9; line-height: 1.7; margin-left: 16px;">
+                  ${subValue}
+                </div>
+              `;
+            } else if (Array.isArray(subValue)) {
+              html += `<div class="ml-4 space-y-2">`;
+              subValue.forEach(item => {
+                html += `
+                  <div class="flex items-start space-x-3">
+                    <span style="color: ${section.color}; font-size: ${baseSize * 0.8}px; margin-top: 4px;">▪</span>
+                    <span style="font-size: ${baseSize * 0.85}px; color: ${textColor}; line-height: 1.7; flex: 1;">
+                      ${item}
+                    </span>
+                  </div>
+                `;
+              });
+              html += `</div>`;
+            } else if (typeof subValue === 'object') {
+              Object.entries(subValue).forEach(([subSubKey, subSubValue]) => {
+                html += `
+                  <div class="ml-4 mb-3">
+                    <div style="font-size: ${baseSize * 0.9}px; font-weight: 600; color: ${textColor}; margin-bottom: 6px;">
+                      ${subSubKey}:
+                    </div>
+                    <div class="ml-4 space-y-2">
+                `;
+                if (Array.isArray(subSubValue)) {
+                  subSubValue.forEach(item => {
+                    html += `
+                      <div class="flex items-start space-x-3">
+                        <span style="color: ${section.color}; font-size: ${baseSize * 0.7}px; margin-top: 5px;">◦</span>
+                        <span style="font-size: ${baseSize * 0.85}px; color: ${textColor}; line-height: 1.7; flex: 1;">
+                          ${item}
+                        </span>
+                      </div>
+                    `;
+                  });
+                }
+                html += `</div></div>`;
+              });
+            }
+            
+            html += `</div>`;
+          });
+          html += `</div>`;
+        }
+      });
+      
+      return html;
+    }
+
+    function createApp() {
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const bgColor = config.background_color || defaultConfig.background_color;
+      const surfaceColor = config.surface_color || defaultConfig.surface_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+      const primaryColor = config.primary_action || defaultConfig.primary_action;
+      const secondaryColor = config.secondary_action || defaultConfig.secondary_action;
+      
+      const progress = getProgressPercentage();
+
+      return `
+        <div class="w-full min-h-full" style="background-color: ${bgColor}; color: ${textColor}; font-family: '${customFont}', sans-serif;">
+          <!-- Header -->
+          <header class="no-print w-full py-6" style="background-color: ${surfaceColor};">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div class="flex items-center justify-between mb-6">
+                <button onclick="window.history.back()" 
+                        class="hover:opacity-80 transition-opacity"
+                        style="color: ${primaryColor}; font-size: ${baseSize * 0.9}px; font-weight: 600;">
+                  ${config.back_button || defaultConfig.back_button}
+                </button>
+                
+                <div class="flex items-center space-x-3">
+                  <button onclick="expandAll()" 
+                          class="px-4 py-2 rounded-lg transition-all hover:scale-105"
+                          style="background-color: ${primaryColor}; color: ${bgColor}; font-size: ${baseSize * 0.85}px; font-weight: 600;">
+                    ${config.expand_all_button || defaultConfig.expand_all_button}
+                  </button>
+                  <button onclick="collapseAll()" 
+                          class="px-4 py-2 rounded-lg transition-all hover:scale-105"
+                          style="background-color: ${surfaceColor}; border: 2px solid ${primaryColor}; color: ${primaryColor}; font-size: ${baseSize * 0.85}px; font-weight: 600;">
+                    ${config.collapse_all_button || defaultConfig.collapse_all_button}
+                  </button>
+                </div>
+              </div>
+
+              <div class="text-center mb-6">
+                <h1 style="font-size: ${baseSize * 2.5}px; font-weight: 800; color: ${textColor}; margin-bottom: 8px;">
+                  📚 ${config.page_title || defaultConfig.page_title}
+                </h1>
+                <p style="font-size: ${baseSize * 1.1}px; color: ${textColor}; opacity: 0.8;">
+                  ${config.page_subtitle || defaultConfig.page_subtitle}
+                </p>
+              </div>
+
+              <!-- Progress -->
+              <div class="max-w-md mx-auto mb-6">
+                <div class="flex items-center justify-between mb-2">
+                  <span style="font-size: ${baseSize * 0.9}px; font-weight: 600; color: ${textColor};">
+                    Progress Pembelajaran
+                  </span>
+                  <span style="font-size: ${baseSize * 0.9}px; font-weight: 700; color: ${primaryColor};">
+                    ${progress}%
+                  </span>
+                </div>
+                <div class="w-full h-3 rounded-full" style="background-color: ${bgColor};">
+                  <div class="h-full rounded-full transition-all duration-500" 
+                       style="width: ${progress}%; background: linear-gradient(90deg, ${primaryColor} 0%, ${secondaryColor} 100%);"></div>
+                </div>
+                <div style="font-size: ${baseSize * 0.8}px; color: ${textColor}; opacity: 0.7; margin-top: 4px; text-align: center;">
+                  ${checkedTopics.size} dari ${summaryData.length} topik telah dikuasai
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="flex flex-wrap gap-3 justify-center">
+                <button onclick="downloadPDF()" 
+                        class="px-5 py-2 rounded-lg transition-all hover:scale-105"
+                        style="background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%); color: white; font-size: ${baseSize * 0.9}px; font-weight: 600;">
+                  ${config.download_pdf_button || defaultConfig.download_pdf_button}
+                </button>
+                <button onclick="downloadPNG()" 
+                        class="px-5 py-2 rounded-lg transition-all hover:scale-105"
+                        style="background-color: ${surfaceColor}; border: 2px solid ${secondaryColor}; color: ${secondaryColor}; font-size: ${baseSize * 0.9}px; font-weight: 600;">
+                  ${config.download_png_button || defaultConfig.download_png_button}
+                </button>
+                <button onclick="printPage()" 
+                        class="px-5 py-2 rounded-lg transition-all hover:scale-105"
+                        style="background-color: ${surfaceColor}; border: 2px solid ${primaryColor}; color: ${primaryColor}; font-size: ${baseSize * 0.9}px; font-weight: 600;">
+                  ${config.print_button || defaultConfig.print_button}
+                </button>
+              </div>
+            </div>
+          </header>
+
+          <!-- Mind Map -->
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            ${createMindMap()}
+          </div>
+
+          <!-- Main Content -->
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+            <div class="flex gap-8">
+              <!-- Sidebar TOC -->
+              <aside class="no-print hidden lg:block w-64">
+                <div class="sticky-toc rounded-xl p-6" style="background-color: ${surfaceColor};">
+                  <h3 style="font-size: ${baseSize * 1.1}px; font-weight: 700; color: ${textColor}; margin-bottom: 16px;">
+                    📑 Daftar Isi
+                  </h3>
+                  <div class="space-y-2">
+                    ${summaryData.map((section, index) => `
+                      <div class="toc-item flex items-center space-x-3 p-2 rounded-lg ${activeSection === section.id ? 'active' : ''}"
+                           onclick="scrollToSection(${section.id})"
+                           style="color: ${activeSection === section.id ? section.color : textColor}; background-color: ${activeSection === section.id ? section.color + '22' : 'transparent'};">
+                        <span style="font-size: ${baseSize * 1.2}px;">${section.icon}</span>
+                        <span style="font-size: ${baseSize * 0.85}px; line-height: 1.4;">
+                          ${index + 1}. ${section.title}
+                        </span>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              </aside>
+
+              <!-- Content -->
+              <main id="summary-content" class="flex-1">
+                ${summaryData.map((section, index) => {
+                  const isExpanded = expandedSections.has(section.id);
+                  const isChecked = checkedTopics.has(section.id);
+                  
+                  return `
+                    <div id="section-${section.id}" class="mb-6 fade-in ${index > 0 ? 'print-page-break' : ''}">
+                      <div class="rounded-2xl overflow-hidden" style="background-color: ${surfaceColor}; border: 3px solid ${section.color};">
+                        <!-- Header -->
+                        <div class="accordion-header p-6" onclick="toggleSection(${section.id})"
+                             style="background: linear-gradient(135deg, ${section.color}22 0%, ${section.color}11 100%);">
+                          <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4 flex-1">
+                              <div class="flex-shrink-0 w-16 h-16 rounded-2xl flex items-center justify-center"
+                                   style="background: ${section.color};">
+                                <span style="font-size: ${baseSize * 2}px;">${section.icon}</span>
+                              </div>
+                              <div class="flex-1">
+                                <div style="font-size: ${baseSize * 0.8}px; color: ${section.color}; font-weight: 600; margin-bottom: 4px;">
+                                  BAGIAN ${index + 1}
+                                </div>
+                                <h2 style="font-size: ${baseSize * 1.5}px; font-weight: 700; color: ${textColor};">
+                                  ${section.title}
+                                </h2>
+                              </div>
+                            </div>
+                            
+                            <div class="flex items-center space-x-4 no-print">
+                              <label class="flex items-center space-x-2 cursor-pointer" onclick="event.stopPropagation()">
+                                <input 
+                                  type="checkbox" 
+                                  class="checkbox-custom"
+                                  ${isChecked ? 'checked' : ''}
+                                  onchange="toggleCheck(${section.id})"
+                                  style="border-color: ${section.color}; background-color: ${isChecked ? section.color : 'transparent'};"
+                                />
+                                <span style="font-size: ${baseSize * 0.85}px; color: ${textColor}; white-space: nowrap;">
+                                  Dikuasai
+                                </span>
+                              </label>
+                              
+                              <div style="font-size: ${baseSize * 1.5}px; color: ${section.color};">
+                                ${isExpanded ? '▲' : '▼'}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="accordion-content ${isExpanded ? 'expanded' : ''}" style="background-color: ${surfaceColor};">
+                          <div class="p-6">
+                            ${createSectionContent(section)}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </main>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function onConfigChange(newConfig) {
+      config = { ...config, ...newConfig };
+      updateUI();
+    }
+
+    function updateUI() {
+      const app = document.getElementById('app');
+      if (app) {
+        app.innerHTML = createApp();
+      }
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [
+          {
+            get: () => config.background_color || defaultConfig.background_color,
+            set: (value) => {
+              config.background_color = value;
+              window.elementSdk.setConfig({ background_color: value });
+            }
+          },
+          {
+            get: () => config.surface_color || defaultConfig.surface_color,
+            set: (value) => {
+              config.surface_color = value;
+              window.elementSdk.setConfig({ surface_color: value });
+            }
+          },
+          {
+            get: () => config.text_color || defaultConfig.text_color,
+            set: (value) => {
+              config.text_color = value;
+              window.elementSdk.setConfig({ text_color: value });
+            }
+          },
+          {
+            get: () => config.primary_action || defaultConfig.primary_action,
+            set: (value) => {
+              config.primary_action = value;
+              window.elementSdk.setConfig({ primary_action: value });
+            }
+          },
+          {
+            get: () => config.secondary_action || defaultConfig.secondary_action,
+            set: (value) => {
+              config.secondary_action = value;
+              window.elementSdk.setConfig({ secondary_action: value });
+            }
+          }
+        ],
+        borderables: [],
+        fontEditable: {
+          get: () => config.font_family || defaultConfig.font_family,
+          set: (value) => {
+            config.font_family = value;
+            window.elementSdk.setConfig({ font_family: value });
+          }
+        },
+        fontSizeable: {
+          get: () => config.font_size || defaultConfig.font_size,
+          set: (value) => {
+            config.font_size = value;
+            window.elementSdk.setConfig({ font_size: value });
+          }
+        }
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ["page_title", config.page_title || defaultConfig.page_title],
+        ["page_subtitle", config.page_subtitle || defaultConfig.page_subtitle],
+        ["expand_all_button", config.expand_all_button || defaultConfig.expand_all_button],
+        ["collapse_all_button", config.collapse_all_button || defaultConfig.collapse_all_button],
+        ["download_pdf_button", config.download_pdf_button || defaultConfig.download_pdf_button],
+        ["download_png_button", config.download_png_button || defaultConfig.download_png_button],
+        ["print_button", config.print_button || defaultConfig.print_button],
+        ["back_button", config.back_button || defaultConfig.back_button]
+      ]);
+    }
+
+    async function init() {
+      checkedTopics = getCheckedTopics();
+      
+      if (window.elementSdk) {
+        window.elementSdk.init({
+          defaultConfig,
+          onConfigChange,
+          mapToCapabilities,
+          mapToEditPanelValues
+        });
+        
+        config = window.elementSdk.config;
+      }
+      
+      updateUI();
+    }
+
+    window.toggleSection = toggleSection;
+    window.toggleCheck = toggleCheck;
+    window.expandAll = expandAll;
+    window.collapseAll = collapseAll;
+    window.scrollToSection = scrollToSection;
+    window.downloadPDF = downloadPDF;
+    window.downloadPNG = downloadPNG;
+    window.printPage = printPage;
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a3edfc8b224051a',t:'MTc2NDA0OTg4NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
